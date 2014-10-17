@@ -7,15 +7,12 @@
 #include <boost/tokenizer.hpp>
 std::string UserHostInfo();
 void Prompt();
-void Parse(const char** argslist);
-std::vector<std::string> ParseDashArg(const std::string& dashlist);
 bool ContainsHome(const std::string& pwd, const std::string& loginname);
 
 
 int main() {
-    std::string list = "ls";
 
-    const char** test = new const char*[10];
+    std::cout << UserHostInfo();
     //execvp(list.c_str(), args);
     
 }
@@ -31,32 +28,22 @@ std::string UserHostInfo() {
     delete [] rawhost;
 
     std::string cwd(get_current_dir_name());
-    if(ContainsHome)
+    if(ContainsHome(cwd, loginname))
         std::cout << "hey";
     return loginname+"@"+hostname+":"+cwd+"$ ";
 }
 
 bool ContainsHome(const std::string& pwd, const std::string& loginname) {
     std::string target = "/home/"+loginname+"/";
-    if (pwd.find(target) == 0)
-        return true;
+    if (pwd.find(target) == 0) {
+                return true;
+    }
     return false;
-}
-
-void ArgsFill(const char** argslist) {
-
-
-
 }
 
 void Prompt() {
     std::cout << UserHostInfo();
     std::string input;
     std::cin >> input;
-
-}
-std::vector<std::string> ParseDashArg(const std::string& dashlist) {
-
-
 
 }
