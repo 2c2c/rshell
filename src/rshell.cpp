@@ -22,11 +22,13 @@ std::list<std::string> Split(const std::string& input);
 
 void Parse(std::list<std::string>& input);
 
-
-
-//return false on single instances of an operator
-//this simplifies && and || parsing since im not implementing
-//bitwise operators
+// takes the input list and an operator character and merges all repeating instances of that character within the list
+// operators in shell can use the same symbol a different amount of times to represent different things
+// ie bitwise & vs and &&
+// the delimiter method I used to separate the arguments in the first place only had single character delimiting available
+// since the function is general it will:
+// avoid having to create new handcrafted parses when more features have to be added
+// make bug checking general and simple (is & implemented? is &&& implemented? if not theyre bugs)
 void RebuildOps(std::list<std::string>& input, std::string op);
 
 int main() {
@@ -96,32 +98,23 @@ void RebuildOps(std::list<std::string>& input, std::string op) {
     using namespace std;
     auto front = input.begin();
     auto back = input.end();
-    while(front != back) {
-        auto element = find(front, back, op);
-        auto next = find(front, back, op);
-
-        cout<< "front element" << endl;
-        //escape the last possible case
-        if (element == back)
-            break; 
-
-        while(element != back) {
-            next++;
-            if (next == back) {
-                break;
-            }
-            else if (*element == *next) {
-                cout<< "found a next" << endl;
-                auto merged_symbols = *element + *next;
-                element = input.erase(element);
-                element = input.insert(element, merged_symbols);
-                element = input.erase(next);
-            }
-            else {
-                break;
-            }
+    while (front != back) {
+      auto element = find(front, back, op);
+      int count = 0;
+      while (element != back) {
+        if (*element == op) {
+          element = input.erase(element);
+          count++;
         }
-        front = element;
-        front++;
+        else {
+          break;
+        }
+    }
+      std::string tempstr = "";
+      while (count--) {
+        tempstr += op;
+      }
+      front = input.insert(element, tempstr);
+      front++;
     }
 }
