@@ -8,8 +8,15 @@
 #include <algorithm>
 #include <boost/tokenizer.hpp>
 
+const std::vector<std::string>
+DEFINED_OPERATORS =
+{"&&", "||", ";"};
+
+
+void CombineDefinedOps(std::list<std::string>& input); 
+
 //uses unix calls to get username and hostname
-//returns 'shellish' formatted str ie U@H: 
+//returns 'shellish' formatted str ie usrname@host:~$ 
 std::string UserHostInfo();
 
 //output username@hostname$ and wait for command input
@@ -36,13 +43,13 @@ int main() {
         auto cmd = Prompt();
         auto input = Split(cmd);
         RebuildOps(input, "&");
+
         Parse(input);
     }
 
     //execvp(list.c_str(), args);
 
 }
-
 std::string UserHostInfo() {
     std::string loginname(getlogin());
 
@@ -59,10 +66,8 @@ std::string UserHostInfo() {
         pwd.erase(0,target.size());
         pwd = "~/"+pwd;
     }
-
     return loginname+"@"+hostname+":"+pwd+"$ ";
 }
-
 std::string Prompt() {
     std::cout << UserHostInfo();
     std::string input;
@@ -99,22 +104,28 @@ void RebuildOps(std::list<std::string>& input, std::string op) {
     auto front = input.begin();
     auto back = input.end();
     while (front != back) {
-      auto element = find(front, back, op);
-      int count = 0;
-      while (element != back) {
-        if (*element == op) {
-          element = input.erase(element);
-          count++;
+        auto element = find(front, back, op);
+        int count = 0;
+        while (element != back) {
+            if (*element == op) {
+                element = input.erase(element);
+                count++;
+            }
+            else {
+                break;
+            }
         }
-        else {
-          break;
+        std::string tempstr = "";
+        while (count--) {
+            tempstr += op;
         }
+        front = input.insert(element, tempstr);
+        front++;
     }
-      std::string tempstr = "";
-      while (count--) {
-        tempstr += op;
-      }
-      front = input.insert(element, tempstr);
-      front++;
+}
+void CombineDefinedOps(std::list<std::string>& input) {
+    for(const auto& op : DEFINED_OPERATORS) {
+        auto single = op.substr(0,1);
+        RebuildOps(input, single);
     }
 }
