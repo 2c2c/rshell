@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <list>
 #include <sstream>
 #include <algorithm>
 #include <boost/tokenizer.hpp>
@@ -14,13 +15,30 @@ std::string UserHostInfo();
 //output username@hostname$ and wait for command input
 std::string Prompt();
 
-std::vector<std::string> Split(const std::string& input);
-void Parse(std::vector<std::string>& input);
+//separates string by delimeters into vector elements
+//if # is found it excludes it and anything beyond in the string
+std::list<std::string> Split(const std::string& input);
+
+
+void Parse(std::list<std::string>& input);
+
+
+
+//return false on single instances of an operator
+//this simplifies && and || parsing since im not implementing
+//bitwise operators
+void RebuildOps(std::list<std::string>& input, std::string op);
+
 int main() {
-    auto cmd = Prompt();
-    Split(cmd);
+    while(true) {
+        auto cmd = Prompt();
+        auto input = Split(cmd);
+        RebuildOps(input, "&");
+        Parse(input);
+    }
+
     //execvp(list.c_str(), args);
-    
+
 }
 
 std::string UserHostInfo() {
@@ -32,7 +50,7 @@ std::string UserHostInfo() {
     delete [] rawhost;
 
     std::string pwd(get_current_dir_name());
-    
+
     //handles /home/username -> ~/ shortcut
     std::string target = "/home/"+loginname+"/";
     if (pwd.find(target) == 0) {
@@ -50,13 +68,10 @@ std::string Prompt() {
     return input;
 }
 
-//&& || ;
-//#
-
-std::vector<std::string> Split(const std::string& input) {
+std::list<std::string> Split(const std::string& input) {
     using namespace boost;
     using namespace std;
-    vector<string> input_split;
+    list<string> input_split;
     char_separator<char> sep("", " #&|;");   
     typedef tokenizer<char_separator<char>> tokener;
 
@@ -71,7 +86,42 @@ std::vector<std::string> Split(const std::string& input) {
     return input_split;
 }
 
-void Parse(std::vector<std::string>& input) {
+void Parse(std::list<std::string>& input) {
+    using namespace std;
+    for (const auto& e : input)
+        cout << e << endl;
 
+}
+void RebuildOps(std::list<std::string>& input, std::string op) {
+    using namespace std;
+    auto front = input.begin();
+    auto back = input.end();
+    while(front != back) {
+        auto element = find(front, back, op);
+        auto next = find(front, back, op);
 
+        cout<< "front element" << endl;
+        //escape the last possible case
+        if (element == back)
+            break; 
+
+        while(element != back) {
+            next++;
+            if (next == back) {
+                break;
+            }
+            else if (*element == *next) {
+                cout<< "found a next" << endl;
+                auto merged_symbols = *element + *next;
+                element = input.erase(element);
+                element = input.insert(element, merged_symbols);
+                element = input.erase(next);
+            }
+            else {
+                break;
+            }
+        }
+        front = element;
+        front++;
+    }
 }
