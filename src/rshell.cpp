@@ -5,14 +5,18 @@
 #include <vector>
 #include <list>
 #include <sstream>
+#include <map>
 #include <algorithm>
 #include <boost/tokenizer.hpp>
 
-const std::vector<std::string>
-DEFINED_OPERATORS =
-{"&&", "||", ";"};
+const std::multimap<std::string, int>
+DEFINED_OPS = {
+    std::make_pair("&",2),
+    std::make_pair("|",2),
+    std::make_pair(";",1)
+};
 
-
+const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
 void CombineDefinedOps(std::list<std::string>& input); 
 
 //uses unix calls to get username and hostname
@@ -27,7 +31,7 @@ std::string Prompt();
 std::list<std::string> Split(const std::string& input);
 
 
-void Parse(std::list<std::string>& input);
+void Output(std::list<std::string>& input);
 
 // takes the input list and an operator character and merges all repeating instances of that character within the list
 // operators in shell can use the same symbol a different amount of times to represent different things
@@ -42,9 +46,8 @@ int main() {
     while(true) {
         auto cmd = Prompt();
         auto input = Split(cmd);
-        RebuildOps(input, "&");
-
-        Parse(input);
+        CombineDefinedOps(input);
+        Output(input);
     }
 
     //execvp(list.c_str(), args);
@@ -93,7 +96,7 @@ std::list<std::string> Split(const std::string& input) {
     return input_split;
 }
 
-void Parse(std::list<std::string>& input) {
+void Output(std::list<std::string>& input) {
     using namespace std;
     for (const auto& e : input)
         cout << e << endl;
@@ -124,8 +127,7 @@ void RebuildOps(std::list<std::string>& input, std::string op) {
     }
 }
 void CombineDefinedOps(std::list<std::string>& input) {
-    for(const auto& op : DEFINED_OPERATORS) {
-        auto single = op.substr(0,1);
-        RebuildOps(input, single);
+    for(const auto& op : DEFINED_OPS) {
+        RebuildOps(input, op.first);
     }
 }
