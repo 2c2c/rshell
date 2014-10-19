@@ -21,6 +21,7 @@ const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
 void RepeatSweep(const std::list<std::string>& input); 
 bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> op); 
 void CombineDefinedOps(std::list<std::string>& input); 
+bool UnimplementedOp(const std::list<std::string>& input, std::string op); 
 
 //uses unix calls to get username and hostname
 //returns 'shellish' formatted str ie usrname@host:~$ 
@@ -80,12 +81,11 @@ std::string Prompt() {
     std::getline(std::cin, input);
     return input;
 }
-
 std::list<std::string> Split(const std::string& input) {
     using namespace boost;
     using namespace std;
     list<string> input_split;
-    char_separator<char> sep("", " #&|;");   
+    char_separator<char> sep(" ", "#&|;");   
     typedef tokenizer<char_separator<char>> tokener;
 
     tokener tokens(input, sep);
@@ -98,7 +98,6 @@ std::list<std::string> Split(const std::string& input) {
 
     return input_split;
 }
-
 void Output(std::list<std::string>& input) {
     using namespace std;
     for (const auto& e : input)
@@ -156,9 +155,9 @@ bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,
         auto itr = std::find_if(front, back,
                 [&](std::string elem) {
                 if (elem.find(rebuilt_op) == std::string::npos)
-                return false;
+                    return false;
                 else
-                return true;
+                    return true;
                 });
         if (itr == back)
             return false;
@@ -171,5 +170,15 @@ bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,
             front++;
         }
     }
+    return true;
+}
+bool UnimplementedOp(const std::list<std::string>& input, std::string op) {
+    using namespace std;
+    auto itr = find(input.begin(), input.end(), op);
+    if(itr == input.end()) {
+        cout << "operator '" << op << "' is unimplemented" << endl;
+        return false;
+    }
+
     return true;
 }
