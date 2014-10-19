@@ -17,6 +17,9 @@ DEFINED_OPS = {
 };
 
 const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
+
+void RepeatSweep(const std::list<std::string>& input); 
+bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> op); 
 void CombineDefinedOps(std::list<std::string>& input); 
 
 //uses unix calls to get username and hostname
@@ -47,7 +50,7 @@ int main() {
         auto cmd = Prompt();
         auto input = Split(cmd);
         CombineDefinedOps(input);
-        Output(input);
+        RepeatSweep(input);
     }
 
     //execvp(list.c_str(), args);
@@ -130,4 +133,43 @@ void CombineDefinedOps(std::list<std::string>& input) {
     for(const auto& op : DEFINED_OPS) {
         RebuildOps(input, op.first);
     }
+}
+void RepeatSweep(const std::list<std::string>& input) {
+    using namespace std;
+    for (const auto& op : DEFINED_OPS) {
+        if(InvalidRepeatOp(input,op)) {
+            cout << "Invalid '" << op.first << "' usage found" << endl
+                 << "known operator used an invalid amount of consecutive" << endl
+                 << "times: e.g. '&&&' -> '&&' ?" << endl;
+        }
+    }
+}
+bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> pair) {
+    std::string rebuilt_op = "";
+    auto op_size = pair.second;
+    while(op_size--) {
+        rebuilt_op+= pair.first;
+    }
+    auto front = input.begin();
+    auto back = input.end();
+    while(front != back) {
+        auto itr = std::find_if(front, back,
+                [&](std::string elem) {
+                if (elem.find(rebuilt_op) == std::string::npos)
+                return false;
+                else
+                return true;
+                });
+        if (itr == back)
+            return false;
+
+        else if (*itr != rebuilt_op)
+            break;
+
+        else {
+            front = itr;
+            front++;
+        }
+    }
+    return true;
 }
