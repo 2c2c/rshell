@@ -264,6 +264,7 @@ bool UseCommand(std::list<std::string> &input) {
         execvp(rawcommand[0], rawcommand);
         if(errno!=0) {
             perror("Error in execvp. Likely a nonexisting command?\n");
+            exit(1);
         }
         for (size_t i = 0; i < vectorcommand.size(); i++)
             delete[] rawcommand[i];
@@ -314,6 +315,8 @@ void Execute(std::list<std::string>& input) {
         return;
     bool cmdstate = true;
     while(!input.empty()) {
+        if(input.front() == "exit")
+            exit(0);
         if (cmdstate)
             cmdstate = UseCommand(input);
         else 
