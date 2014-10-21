@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
+#include <pwd.h>
 
 const std::multimap<std::string, int>
 DEFINED_OPS = {
@@ -98,17 +99,17 @@ int main() {
     }
 }
 std::string UserHostInfo() {
-    char* rawlogin = getlogin();
-    if (rawlogin == NULL) {
-        perror("getlogin returned NULL\n");
+    auto test = getpwuid(getuid());
+    if (errno!=0) {
+        perror("error in getpwuid");
         exit(1);
     }
-    std::string login(rawlogin);
+    std::string login(test->pw_name);
 
     char *rawhost= new char[100];
     auto status = gethostname(rawhost,100);
     if(status == -1) {
-        perror("gethostname failed\n");
+        perror("gethostname failed");
     }
 
     std::string hostname(rawhost);
@@ -116,17 +117,17 @@ std::string UserHostInfo() {
 
     char* rawpwd = get_current_dir_name();
     if(rawpwd == NULL) {
-        perror("get_current_dir_name returned NULL\n");
+        perror("get_current_dir_name returned NULL");
         exit(1);
     }
     std::string pwd(rawpwd);
-    
+    delete rawpwd;
 
     //handles /home/username -> ~/ shortcut
-    std::string target = "/home/"+login+"/";
+    std::string target = test->pw_dir;
     if (pwd.find(target) == 0) {
         pwd.erase(0,target.size());
-        pwd = "~/"+pwd;
+        pwd = "~"+pwd;
     }
     return login+"@"+hostname+":"+pwd+"$ ";
 }
@@ -257,13 +258,13 @@ bool UseCommand(std::list<std::string> &input) {
     pid_t wait_val;
     auto pid = fork();
     if (pid==-1) {
-        perror("Error on fork\n");
+        perror("Error on fork");
         exit(1);
     }
     if (pid==0) {
         execvp(rawcommand[0], rawcommand);
         if(errno!=0) {
-            perror("Error in execvp. Likely a nonexisting command?\n");
+            perror("Error in execvp. Likely a nonexisting command?");
             exit(1);
         }
         for (size_t i = 0; i < vectorcommand.size(); i++)
@@ -273,7 +274,7 @@ bool UseCommand(std::list<std::string> &input) {
        wait_val = wait(0);
     }
     if (wait_val == -1) {
-        perror("Error on waiting for child process to finish\n");
+        perror("Error on waiting for child process to finish");
         exit(1);
     }
     return true;
