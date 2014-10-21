@@ -22,18 +22,47 @@ DEFINED_OPS = {
 
 const std::vector<std::string> IMPLEMENTED_OPS{"&&","||",";"};
 
-
+// handles what to do with finalized input state
 void Execute(std::list<std::string>& input);
+
+// assumes an operator in the first position of the input list
+// extracts and pops it for determination of shell command flow
 bool UseOperator(std::list<std::string>& input, bool prevcommandstate);
 
+// used when an UseOperator returns false ie asdf && ls
+// the first command is false and && must force a properly inputted second command
+// to not execute. the command is extracted from the input list and nothing
+// is done with it.
 void DumpCommand(std::list<std::string>& input);
+
+// assumes non operator in first position of the list
+// tokens are extracted from the list until an operator or the end of
+// the list is reached. the command is forked and execvp'd
 bool UseCommand(std::list<std::string>& input);
-bool ContainsImplementedOp(std::string);
+
+// helper function that searched through global const IMPLEMENTED_OPS
+// checks inputted string to see if it matches any within the vector
+bool ContainsImplementedOp(std::string token);
 
 
+// Returns true on >1 operators occuring back to back
+// e.g. "&&&&&", ";;", etc.
 bool FoundRepeat(const std::list<std::string>& input); 
+
+// assumes all like-operators have been merged together
+// this finds 'strings' of operators that are too long
+// rebuilds a std pair from the global const map DEFINED_OPS
+// uses it as param to string::find on each element of the input list
+// if its found that means it CONTAINS the operator. checking if it
+// doesn't equal at this point means it's using operator symbols of an
+// incorrect type.
 bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> op); 
+
+// helper function that calls RebuildOps with each element of global const
+// DEFINED_OPS as 2nd parameter (the single instances of & | ;)
 void CombineDefinedOps(std::list<std::string>& input); 
+
+//unused check for unimplemented operators
 bool UnimplementedOp(const std::list<std::string>& input, std::string op); 
 
 //uses unix calls to get username and hostname
@@ -48,6 +77,7 @@ std::string Prompt();
 std::list<std::string> Split(const std::string& input);
 
 
+//debugging inputlist outputter
 void Output(std::list<std::string>& input);
 
 // takes the input list and an operator character and merges all repeating instances of that character within the list
@@ -191,7 +221,6 @@ bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,
 
         else if (*itr != rebuilt_op)
             break;
-
         else {
             front = itr;
             front++;
