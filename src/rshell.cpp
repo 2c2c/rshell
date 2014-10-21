@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <string>
+#include <string.h>
 #include <memory>
 #include <vector>
 #include <list>
@@ -16,7 +17,15 @@ DEFINED_OPS = {
     std::make_pair(";",1)
 };
 
+const std::vector<std::string> IMPLEMENTED_OPS{"&&","||",";"};
 const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
+
+
+
+
+void UseCommand(std::list<std::string>& input);
+bool ContainsImplementedOp(std::string);
+
 
 void RepeatSweep(const std::list<std::string>& input); 
 bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> op); 
@@ -52,10 +61,8 @@ int main() {
         auto input = Split(cmd);
         CombineDefinedOps(input);
         RepeatSweep(input);
+        UseCommand(input);
     }
-
-    //execvp(list.c_str(), args);
-
 }
 std::string UserHostInfo() {
     std::string loginname(getlogin());
@@ -124,7 +131,9 @@ void RebuildOps(std::list<std::string>& input, std::string op) {
         while (count--) {
             tempstr += op;
         }
-        front = input.insert(element, tempstr);
+        cout<<input.size();
+        if(!tempstr.empty())
+            front = input.insert(element, tempstr);
         front++;
     }
 }
@@ -181,4 +190,32 @@ bool UnimplementedOp(const std::list<std::string>& input, std::string op) {
     }
 
     return true;
+}
+void UseCommand(std::list<std::string> &input) {
+    using namespace std;
+
+    //Take list of strings and make copies of their c_strs and put into vector
+    //a vector of char* can be used as char** if used as such
+    vector<char *> vectorcommand;
+    while (!input.empty() && !ContainsImplementedOp(input.front())) {
+        string transferstr = input.front();
+        input.pop_front();
+        char* cstrcopy = new char[transferstr.size()+1];
+        memcpy(cstrcopy, transferstr.c_str(), transferstr.size()+1);
+        cstrcopy[transferstr.size()] = 0;
+        vectorcommand.push_back(cstrcopy);
+    }
+    vectorcommand.push_back(NULL);
+
+    char** rawcommand = &vectorcommand[0];
+
+    execvp(rawcommand[0], rawcommand);
+    for (size_t i = 0; i < vectorcommand.size(); i++)
+        delete[] rawcommand[i];
+}
+bool ContainsImplementedOp(std::string token) {
+    auto match = find(IMPLEMENTED_OPS.begin(), IMPLEMENTED_OPS.end(), token);
+    if(match != IMPLEMENTED_OPS.end())
+        return true;
+    return false;
 }
