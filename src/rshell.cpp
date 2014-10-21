@@ -8,7 +8,10 @@
 #include <sstream>
 #include <map>
 #include <algorithm>
+#include <stdio.h>
 #include <boost/tokenizer.hpp>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 const std::multimap<std::string, int>
 DEFINED_OPS = {
@@ -21,9 +24,11 @@ const std::vector<std::string> IMPLEMENTED_OPS{"&&","||",";"};
 const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
 
 
+void Execute(std::list<std::string>& input);
+bool UseOperator(std::list<std::string>& input, bool prevcommandstate);
 
-
-void UseCommand(std::list<std::string>& input);
+void DumpCommand(std::list<std::string>& input);
+bool UseCommand(std::list<std::string>& input);
 bool ContainsImplementedOp(std::string);
 
 
@@ -61,7 +66,7 @@ int main() {
         auto input = Split(cmd);
         CombineDefinedOps(input);
         RepeatSweep(input);
-        UseCommand(input);
+        Execute(input);
     }
 }
 std::string UserHostInfo() {
@@ -83,7 +88,7 @@ std::string UserHostInfo() {
     return loginname+"@"+hostname+":"+pwd+"$ ";
 }
 std::string Prompt() {
-    std::cout << UserHostInfo();
+    std::cout << "->" << UserHostInfo();
     std::string input;
     std::getline(std::cin, input);
     return input;
@@ -102,7 +107,6 @@ std::list<std::string> Split(const std::string& input) {
         if (t == "#") break;
         input_split.push_back(t);
     }
-
     return input_split;
 }
 void Output(std::list<std::string>& input) {
@@ -131,7 +135,6 @@ void RebuildOps(std::list<std::string>& input, std::string op) {
         while (count--) {
             tempstr += op;
         }
-        cout<<input.size();
         if(!tempstr.empty())
             front = input.insert(element, tempstr);
         front++;
@@ -188,13 +191,12 @@ bool UnimplementedOp(const std::list<std::string>& input, std::string op) {
         cout << "operator '" << op << "' is unimplemented" << endl;
         return false;
     }
-
     return true;
 }
-void UseCommand(std::list<std::string> &input) {
+bool UseCommand(std::list<std::string> &input) {
     using namespace std;
 
-    //Take list of strings and make copies of their c_strs and put into vector
+    //Take list of strings, make copies of their c_strs, and put into vector
     //a vector of char* can be used as char** if used as such
     vector<char *> vectorcommand;
     while (!input.empty() && !ContainsImplementedOp(input.front())) {
@@ -208,14 +210,73 @@ void UseCommand(std::list<std::string> &input) {
     vectorcommand.push_back(NULL);
 
     char** rawcommand = &vectorcommand[0];
-
-    execvp(rawcommand[0], rawcommand);
-    for (size_t i = 0; i < vectorcommand.size(); i++)
-        delete[] rawcommand[i];
+    pid_t wait_val;
+    auto pid = fork();
+    if (pid==-1) {
+        perror("Error on fork:\n");
+        exit(1);
+    }
+    if (pid==0) {
+        execvp(rawcommand[0], rawcommand);
+        if(errno!=0) {
+            perror("Error in execvp. Likely a nonexisting command?:\n");
+        }
+        for (size_t i = 0; i < vectorcommand.size(); i++)
+            delete[] rawcommand[i];
+    }
+    else {
+       wait_val = wait(0);
+    }
+    if (wait_val == -1) {
+        perror("Error on waiting for child process to finish\n");
+        exit(1);
+    }
+    return true;
 }
 bool ContainsImplementedOp(std::string token) {
     auto match = find(IMPLEMENTED_OPS.begin(), IMPLEMENTED_OPS.end(), token);
     if(match != IMPLEMENTED_OPS.end())
         return true;
     return false;
+}
+bool UseOperator(std::list<std::string>& input, bool prevcommandstate) {
+    using namespace std;
+    if(input.empty())
+        return false;
+    string op = input.front();
+    input.pop_front();
+    if (prevcommandstate == true) {
+        if(op == ";")
+            return true;
+        else if(op == "&&")
+            return true;
+        else if(op == "||")
+            return false;
+    }
+    else {
+        if(op == ";")
+            return true;
+        else if(op == "&&")
+            return false;
+        else if(op == "||")
+            return true;
+    }
+    //proper input ensures we never get down here, so im killing warning message
+    //fixing this 'properly' would make it annoying to add more operators later
+    return false;
+}
+void Execute(std::list<std::string>& input) {
+    bool cmdstate = true;
+    while(!input.empty()) {
+        if (cmdstate)
+            cmdstate = UseCommand(input);
+        else 
+            DumpCommand(input);
+        cmdstate = UseOperator(input, cmdstate);
+    }
+}
+void DumpCommand(std::list<std::string>& input) {
+    while (!input.empty() && !ContainsImplementedOp(input.front())) {
+        input.pop_front();
+    }
 }
