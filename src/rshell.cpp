@@ -21,7 +21,6 @@ DEFINED_OPS = {
 };
 
 const std::vector<std::string> IMPLEMENTED_OPS{"&&","||",";"};
-const std::vector<std::string> DEFINED_ADJACENT_OPS = {};
 
 
 void Execute(std::list<std::string>& input);
@@ -32,7 +31,7 @@ bool UseCommand(std::list<std::string>& input);
 bool ContainsImplementedOp(std::string);
 
 
-void RepeatSweep(const std::list<std::string>& input); 
+bool FoundRepeat(const std::list<std::string>& input); 
 bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> op); 
 void CombineDefinedOps(std::list<std::string>& input); 
 bool UnimplementedOp(const std::list<std::string>& input, std::string op); 
@@ -65,27 +64,41 @@ int main() {
         auto cmd = Prompt();
         auto input = Split(cmd);
         CombineDefinedOps(input);
-        RepeatSweep(input);
         Execute(input);
     }
 }
 std::string UserHostInfo() {
-    std::string loginname(getlogin());
+    char* rawlogin = getlogin();
+    if (rawlogin == NULL) {
+        perror("getlogin returned NULL\n");
+        exit(1);
+    }
+    std::string login(rawlogin);
 
     char *rawhost= new char[100];
-    gethostname(rawhost,100);
+    auto status = gethostname(rawhost,100);
+    if(status == -1) {
+        perror("gethostname failed\n");
+    }
+
     std::string hostname(rawhost);
     delete [] rawhost;
 
-    std::string pwd(get_current_dir_name());
+    char* rawpwd = get_current_dir_name();
+    if(rawpwd == NULL) {
+        perror("get_current_dir_name returned NULL\n");
+        exit(1);
+    }
+    std::string pwd(rawpwd);
+    
 
     //handles /home/username -> ~/ shortcut
-    std::string target = "/home/"+loginname+"/";
+    std::string target = "/home/"+login+"/";
     if (pwd.find(target) == 0) {
         pwd.erase(0,target.size());
         pwd = "~/"+pwd;
     }
-    return loginname+"@"+hostname+":"+pwd+"$ ";
+    return login+"@"+hostname+":"+pwd+"$ ";
 }
 std::string Prompt() {
     std::cout << "->" << UserHostInfo();
@@ -145,15 +158,17 @@ void CombineDefinedOps(std::list<std::string>& input) {
         RebuildOps(input, op.first);
     }
 }
-void RepeatSweep(const std::list<std::string>& input) {
+bool FoundRepeat(const std::list<std::string>& input) {
     using namespace std;
     for (const auto& op : DEFINED_OPS) {
         if(InvalidRepeatOp(input,op)) {
             cout << "Invalid '" << op.first << "' usage found" << endl
                  << "known operator used an invalid amount of consecutive" << endl
                  << "times: e.g. '&&&' -> '&&' ?" << endl;
+                 return true;
         }
     }
+    return false;
 }
 bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,int> pair) {
     std::string rebuilt_op = "";
@@ -213,13 +228,13 @@ bool UseCommand(std::list<std::string> &input) {
     pid_t wait_val;
     auto pid = fork();
     if (pid==-1) {
-        perror("Error on fork:\n");
+        perror("Error on fork\n");
         exit(1);
     }
     if (pid==0) {
         execvp(rawcommand[0], rawcommand);
         if(errno!=0) {
-            perror("Error in execvp. Likely a nonexisting command?:\n");
+            perror("Error in execvp. Likely a nonexisting command?\n");
         }
         for (size_t i = 0; i < vectorcommand.size(); i++)
             delete[] rawcommand[i];
@@ -266,6 +281,8 @@ bool UseOperator(std::list<std::string>& input, bool prevcommandstate) {
     return false;
 }
 void Execute(std::list<std::string>& input) {
+    if(input.empty() || FoundRepeat(input))
+        return;
     bool cmdstate = true;
     while(!input.empty()) {
         if (cmdstate)
