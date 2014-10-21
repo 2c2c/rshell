@@ -1,17 +1,17 @@
-#include <iostream>
-#include <unistd.h>
-#include <string>
-#include <string.h>
-#include <memory>
-#include <vector>
-#include <list>
-#include <sstream>
-#include <map>
 #include <algorithm>
-#include <stdio.h>
 #include <boost/tokenizer.hpp>
+#include <iostream>
+#include <list>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <stdio.h>
+#include <string.h>
+#include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
 
 const std::multimap<std::string, int>
 DEFINED_OPS = {
