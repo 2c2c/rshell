@@ -99,12 +99,12 @@ int main() {
     }
 }
 std::string UserHostInfo() {
-    auto test = getpwuid(getuid());
+    auto userinfo = getpwuid(getuid());
     if (errno!=0) {
         perror("error in getpwuid");
         exit(1);
     }
-    std::string login(test->pw_name);
+    std::string login(userinfo->pw_name);
 
     char *rawhost= new char[100];
     auto status = gethostname(rawhost,100);
@@ -124,7 +124,7 @@ std::string UserHostInfo() {
     delete rawpwd;
 
     //handles /home/username -> ~/ shortcut
-    std::string target = test->pw_dir;
+    std::string target = userinfo->pw_dir;
     if (pwd.find(target) == 0) {
         pwd.erase(0,target.size());
         pwd = "~"+pwd;
