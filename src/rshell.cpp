@@ -255,13 +255,14 @@ bool UseCommand(std::list<std::string> &input) {
     vectorcommand.push_back(NULL);
 
     char** rawcommand = &vectorcommand[0];
-    pid_t wait_val;
+    int exitvalue;
     auto pid = fork();
     if (pid==-1) {
         perror("Error on fork");
         exit(1);
     }
-    if (pid==0) {
+    //child state
+    else if (pid==0) {
         execvp(rawcommand[0], rawcommand);
         if(errno!=0) {
             perror("Error in execvp. Likely a nonexisting command?");
@@ -270,14 +271,23 @@ bool UseCommand(std::list<std::string> &input) {
         for (size_t i = 0; i < vectorcommand.size(); i++)
             delete[] rawcommand[i];
     }
+    //parent
     else {
-       wait_val = wait(0);
+       int status;
+       auto wait_val = wait(&status);
+       if (wait_val == -1) {
+           perror("Error on waiting for child process to finish");
+           exit(1);
+       }
+       exitvalue = WEXITSTATUS(status);
+       for (size_t i = 0; i < vectorcommand.size(); i++)
+           delete[] rawcommand[i];
     }
-    if (wait_val == -1) {
-        perror("Error on waiting for child process to finish");
-        exit(1);
-    }
-    return true;
+
+    if(exitvalue==0)
+        return true;
+    else
+        return false;
 }
 bool ContainsImplementedOp(std::string token) {
     auto match = find(IMPLEMENTED_OPS.begin(), IMPLEMENTED_OPS.end(), token);
@@ -309,6 +319,7 @@ bool UseOperator(std::list<std::string>& input, bool prevcommandstate) {
     }
     //proper input ensures we never get down here, so im killing warning message
     //fixing this 'properly' would make it annoying to add more operators later
+    cout << "what in god's name" <<endl;
     return false;
 }
 void Execute(std::list<std::string>& input) {
