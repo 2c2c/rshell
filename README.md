@@ -7,7 +7,7 @@
 
 Two explicit ideas I had from the start were 1. Build the separation of stuff such that adding new operators is trivial. 2. use a flat coding style.
 
-`1.` Is obvious. No one wants to rewrite half of their functions when the teacher asks to implement new stuff. The parsing I do takes any 'officially defined' single char operator from a special list and uses it as the means to treat that symbol as an operator. It handles n-size single character operator building pretty easily which is particularly usefor for this class given the operators we're being told to define.
+`1.` Is obvious. No one wants to rewrite half of their functions when the teacher asks to implement new stuff. The parsing I do takes any 'officially defined' single char operator from a special list and uses it as the means to treat that symbol as an operator. It handles n-size single character operator building pretty easily which is particularly useful for this class given the operators we're being told to define.
 
 `2.` Gave me problems. My initial thoughts were that there's pretty clearly no useful object structure, so working with free functions would be better. In the middle of coding I realized i was passing my input to just about every function in the program. Which is worse, a god class or a million functions being passed the same state?
 
