@@ -5,7 +5,7 @@
 
 ### design
 
-Two explicit ideas I had from the start were 1. Build the separation of stuff such that adding new operators is trivial. 2. use a flat coding style.
+Two explicit ideas I had from the start were 1. Generalize the stuff such that adding new operators is trivial. 2. use a flat coding style.
 
 `1.` Is obvious. No one wants to rewrite half of their functions when the teacher asks to implement new stuff. The parsing I do takes any 'officially defined' single char operator from a special list and uses it as the means to treat that symbol as an operator. It handles n-size single character operator building pretty easily which is particularly useful for this class given the operators we're being told to define.
 
@@ -26,8 +26,8 @@ Comments were handled by deleting anything from `#` onwards regardless of how th
 
 ### goodies
 
-`rshell` doesn't break on adjacent implemented operators e.g. `ls && || ls` will properly output an error message
+`rshell` doesn't break on adjacent implemented operators e.g. `ls && || ls` will properly output an error message.
 
-nor does it break with large amounts of the same operator e.g. `ls&&&&   ls`.
+Nor does it break with large amounts of the same operator e.g. `ls&&&&   ls`.
 
 While these aren't particularly impressive feats, I am willing to guess that most other implementations won't actually handle the error. It may get indirectly handled by `execvp` while passing in some very strange input.
