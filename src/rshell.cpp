@@ -90,6 +90,8 @@ void Output(std::list<std::string>& input);
 // make bug checking general and simple (is & implemented? is &&& implemented? if not theyre bugs)
 void RebuildOps(std::list<std::string>& input, std::string op);
 
+// does a search in input list for a known operator and checks if the next element is also
+// a known operator.
 bool FoundAdjOp(std::list<std::string>& input);
 
 int main() {
