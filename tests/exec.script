@@ -1,0 +1,144 @@
+Script started on Tue 21 Oct 2014 10:33:15 PM PDT
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ make
+g++ -Wall -Werror -ansi -pedantic -std=c++11 ./src/rshell.cpp -o ./bin/rshell
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/rshell
+->c@ubuntu:~/rshell$ #a command
+->c@ubuntu:~/rshell$ s ls
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ #some parameters
+->c@ubuntu:~/rshell$ ls -a - l  l
+total 40
+drwxrwxr-x  6 c c 4096 Oct 21 22:33 .
+drwxr-xr-x 24 c c 4096 Oct 21 22:26 ..
+drwxrwxr-x  2 c c 4096 Oct 21 22:33 bin
+-rw-rw-r--  1 c c    0 Oct 21 22:33 exec.script
+drwxrwxr-x  8 c c 4096 Oct 21 22:27 .git
+-rw-rw-r--  1 c c 1467 Oct 20 00:29 LICENSE
+-rw-rw-r--  1 c c  192 Oct 21 21:44 Makefile
+-rw-rw-r--  1 c c 3002 Oct 21 22:26 README.md
+drwxrwxr-x  2 c c 4096 Oct 21 22:21 src
+-rw-rw-r--  1 c c  358 Oct 20 01:21 test.cpp
+drwxrwxr-x  2 c c 4096 Oct 21 22:28 tests
+->c@ubuntu:~/rshell$ #a lot of params
+->c@ubuntu:~/rshell$ echo hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hihi hi hi hi hi hi hi hihi hi hi hi hihi 
+hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hi hihi hi hi hi hi hi hi hihi hi hi hi hihi
+->c@ubuntu:~/rshell$ #rshell w in itself
+->c@ubuntu:~/rshell$ bin/rshell
+->c@ubuntu:~/rshell$ d #deo   co  doesnt        cmd doesn't exist
+->c@ubuntu:~/rshell$ doesntexist
+Error in execvp. Likely a nonexisting command?: No such file or directory
+->c@ubuntu:~/rshell$ ls          -l            a -a
+total 40
+drwxrwxr-x  6 c c 4096 Oct 21 22:33 .
+drwxr-xr-x 24 c c 4096 Oct 21 22:26 ..
+drwxrwxr-x  2 c c 4096 Oct 21 22:33 bin
+-rw-rw-r--  1 c c    0 Oct 21 22:33 exec.script
+drwxrwxr-x  8 c c 4096 Oct 21 22:27 .git
+-rw-rw-r--  1 c c 1467 Oct 20 00:29 LICENSE
+-rw-rw-r--  1 c c  192 Oct 21 21:44 Makefile
+-rw-rw-r--  1 c c 3002 Oct 21 22:26 README.md
+drwxrwxr-x  2 c c 4096 Oct 21 22:21 src
+-rw-rw-r--  1 c c  358 Oct 20 01:21 test.cpp
+drwxrwxr-x  2 c c 4096 Oct 21 22:28 tests
+->c@ubuntu:~/rshell$ #  lots of spacing
+->c@ubuntu:~/rshell$ ls -       -  l       -a
+total 40
+drwxrwxr-x  6 c c 4096 Oct 21 22:33 .
+drwxr-xr-x 24 c c 4096 Oct 21 22:26 ..
+drwxrwxr-x  2 c c 4096 Oct 21 22:33 bin
+-rw-rw-r--  1 c c    0 Oct 21 22:33 exec.script
+drwxrwxr-x  8 c c 4096 Oct 21 22:27 .git
+-rw-rw-r--  1 c c 1467 Oct 20 00:29 LICENSE
+-rw-rw-r--  1 c c  192 Oct 21 21:44 Makefile
+-rw-rw-r--  1 c c 3002 Oct 21 22:26 README.md
+drwxrwxr-x  2 c c 4096 Oct 21 22:21 src
+-rw-rw-r--  1 c c  358 Oct 20 01:21 test.cpp
+drwxrwxr-x  2 c c 4096 Oct 21 22:28 tests
+->c@ubuntu:~/rshell$ ls ; ls
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ fails ; ls
+Error in execvp. Likely a nonexisting command?: No such file or directory
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ pwd && ls
+/home/c/rshell
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ fails && ls
+Error in execvp. Likely a nonexisting command?: No such file or directory
+->c@ubuntu:~/rshell$ ls || pwd
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ fails || pwd
+Error in execvp. Likely a nonexisting command?: No such file or directory
+/home/c/rshell
+->c@ubuntu:~/rshell$ #chained commands
+->c@ubuntu:~/rshell$ ls -a || pwd && date && ls     || ps
+.   bin		 .git	  Makefile   src       tests
+..  exec.script  LICENSE  README.md  test.cpp
+  PID TTY          TIME CMD
+20979 pts/23   00:00:00 bash
+20997 pts/23   00:00:00 rshell
+21011 pts/23   00:00:00 rshell
+21039 pts/23   00:00:00 ps
+->c@ubuntu:~/rshell$ #more chains
+->c@ubuntu:~/rshell$ ls ; ls ;ls    ls;s ls;    ls ;;        ;     ls
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ #one more           ls ; pwd && date || ps
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+/home/c/rshell
+Tue Oct 21 22:39:03 PDT 2014
+->c@ubuntu:~/rshell$ ls -l||   akl  l  l||  ;ls&&pwd&&date
+total 32
+drwxrwxr-x 2 c c 4096 Oct 21 22:33 bin
+-rw-rw-r-- 1 c c 4096 Oct 21 22:38 exec.script
+-rw-rw-r-- 1 c c 1467 Oct 20 00:29 LICENSE
+-rw-rw-r-- 1 c c  192 Oct 21 21:44 Makefile
+-rw-rw-r-- 1 c c 3002 Oct 21 22:26 README.md
+drwxrwxr-x 2 c c 4096 Oct 21 22:21 src
+-rw-rw-r-- 1 c c  358 Oct 20 01:21 test.cpp
+drwxrwxr-x 2 c c 4096 Oct 21 22:28 tests
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+/home/c/rshell
+Tue Oct 21 22:40:23 PDT 2014
+->c@ubuntu:~/rshell$ #we  exits s
+->c@ubuntu:~/rshell$ exit
+->c@ubuntu:~/rshell$ #i  m in rshell twice this aint a bug
+->c@ubuntu:~/rshell$ exit kdslfjskdfj
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/rshell
+->c@ubuntu:~/rshell$ ls -a   exit
+ls: cannot access exit: No such file or directory
+->c@ubuntu:~/rshell$ ls -a ; exit
+.   bin		 .git	  Makefile   src       tests
+..  exec.script  LICENSE  README.md  test.cpp
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/rshell
+->c@ubuntu:~/rshell$ #comments (Whyt s      why so many points for such little effort ..                                            20 point !?   s!?)             
+->c@ubuntu:~/rshell$ #stnad   andard
+->c@ubuntu:~/rshell$ pwd #; asdf flskdfjskl jf
+/home/c/rshell
+->c@ubuntu:~/rshell$ ls #-ls a
+bin  exec.script  LICENSE  Makefile  README.md	src  test.cpp  tests
+->c@ubuntu:~/rshell$ #
+->c@ubuntu:~/rshell$ ######
+->c@ubuntu:~/rshell$ ls -a# slkfjd sd jd
+.   bin		 .git	  Makefile   src       tests
+..  exec.script  LICENSE  README.md  test.cpp
+->c@ubuntu:~/rshell$ #some extra ones i made
+->c@ubuntu:~/rshell$ #adjacent opet rators, any     works for any implemented based on a global vector                                 lobal const vector
+->c@ubuntu:~/rshell$ ls||&&ls
+Two operators are adjacent to each other e.g. '&&;' ?
+->c@ubuntu:~/rshell$ ls''  ;;s ls
+Invalid ';' usage found
+known operator used an invalid amount of consecutive
+times: e.g. '&&&' -> '&&' ?
+->c@ubuntu:~/rshell$ pwd || || || ls
+Invalid '|' usage found
+known operator used an invalid amount of consecutive
+times: e.g. '&&&' -> '&&' ?
+->c@ubuntu:~/rshell$ exit
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
+
+Script done on Tue 21 Oct 2014 10:47:13 PM PDT
