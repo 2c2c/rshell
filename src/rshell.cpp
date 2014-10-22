@@ -90,6 +90,8 @@ void Output(std::list<std::string>& input);
 // make bug checking general and simple (is & implemented? is &&& implemented? if not theyre bugs)
 void RebuildOps(std::list<std::string>& input, std::string op);
 
+bool FoundAdjOp(std::list<std::string>& input);
+
 int main() {
     while(true) {
         auto cmd = Prompt();
@@ -194,9 +196,9 @@ bool FoundRepeat(const std::list<std::string>& input) {
     for (const auto& op : DEFINED_OPS) {
         if(InvalidRepeatOp(input,op)) {
             cout << "Invalid '" << op.first << "' usage found" << endl
-                 << "known operator used an invalid amount of consecutive" << endl
-                 << "times: e.g. '&&&' -> '&&' ?" << endl;
-                 return true;
+                << "known operator used an invalid amount of consecutive" << endl
+                << "times: e.g. '&&&' -> '&&' ?" << endl;
+            return true;
         }
     }
     return false;
@@ -213,9 +215,9 @@ bool InvalidRepeatOp(const std::list<std::string>& input, std::pair<std::string,
         auto itr = std::find_if(front, back,
                 [&](std::string elem) {
                 if (elem.find(rebuilt_op) == std::string::npos)
-                    return false;
+                return false;
                 else
-                    return true;
+                return true;
                 });
         if (itr == back)
             return false;
@@ -273,15 +275,15 @@ bool UseCommand(std::list<std::string> &input) {
     }
     //parent
     else {
-       int status;
-       auto wait_val = wait(&status);
-       if (wait_val == -1) {
-           perror("Error on waiting for child process to finish");
-           exit(1);
-       }
-       exitvalue = WEXITSTATUS(status);
-       for (size_t i = 0; i < vectorcommand.size(); i++)
-           delete[] rawcommand[i];
+        int status;
+        auto wait_val = wait(&status);
+        if (wait_val == -1) {
+            perror("Error on waiting for child process to finish");
+            exit(1);
+        }
+        exitvalue = WEXITSTATUS(status);
+        for (size_t i = 0; i < vectorcommand.size(); i++)
+            delete[] rawcommand[i];
     }
 
     if(exitvalue==0)
@@ -323,7 +325,7 @@ bool UseOperator(std::list<std::string>& input, bool prevcommandstate) {
     return false;
 }
 void Execute(std::list<std::string>& input) {
-    if(input.empty() || FoundRepeat(input))
+    if(input.empty() || FoundRepeat(input) || FoundAdjOp(input))
         return;
     bool cmdstate = true;
     while(!input.empty()) {
@@ -340,4 +342,31 @@ void DumpCommand(std::list<std::string>& input) {
     while (!input.empty() && !ContainsImplementedOp(input.front())) {
         input.pop_front();
     }
+}
+bool FoundAdjOp(std::list<std::string> &input) {
+  using namespace std;
+  for (const auto &op : IMPLEMENTED_OPS) {
+    auto element = input.begin();
+    auto front = input.begin();
+    auto next = input.begin();
+
+    auto back = input.end();
+    while (element != input.end()) {
+      element = find(front, back, op);
+      if (element == input.end())
+        continue;
+      next = element;
+      next++;
+      if (next == input.end())
+        continue;
+      else if (find(IMPLEMENTED_OPS.begin(), IMPLEMENTED_OPS.end(), *next) !=
+        IMPLEMENTED_OPS.end()) {
+        cout << "Two operators are adjacent to each other e.g. '&&;' ?" << endl;
+        return true;
+      }
+      front = next;
+      front++;
+    }
+  }
+  return false;
 }
