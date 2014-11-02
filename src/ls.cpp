@@ -8,7 +8,8 @@
 #include <boost/tokenizer.hpp>
 #include <vector>
 #include <list>
-
+#include <set>
+#include <ctype.h>
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
 
@@ -19,11 +20,14 @@ void Output(std::list<std::string> input);
 // the gains from refactoring aren't worth bothering
 std::string CurrentPwd();
 
-bool UnknownArgs(const std::list<std::string> input);
-std::list<std::string> Split(std::string args);
+// iterate each character of each element with a - to look for unknown args
+bool UnknownArgs(std::list<std::string> input);
+std::set<std::string> Split(std::list<std::string> input);
 int main(int argc, char **argv) {
   auto input = GetInput(argc, argv);
   Output(input);
+  if(UnknownArgs(input))
+    std::cout << "oh no" << std::endl;
 
   //    DIR *test = opendir("test");
   //    readdir(test);
@@ -56,12 +60,28 @@ std::string CurrentPwd() {
   delete rawpwd;
   return pwd;
 }
-std::list<std::string> Split(std::string args) {
-  std::string foo = args;
-  std::list<std::string> test;
-  return test;
+std::set<std::string> Split(std::list<std::string> input) {
+  std::set<std::string> args;
+  input.pop_front();
+  for (auto& item : input) {
+    if (item[0] == '-') {
+      item.erase(item.begin());
+      for(const auto& letter : item) {
+        args.emplace(letter);
+        }
+    }
+  }
+  return args;
 }
-bool UnknownArgs(const std::list<std::string> input) {
-  input.empty();
-  return true;
+bool UnknownArgs(std::list<std::string> input) {
+  for (auto &item : input) {
+    if (item[0] == '-') {
+      item.erase(item.begin());
+      for (const auto &letter : item) {
+        if (letter != 'l' && letter != 'a' && tolower(letter) != 'r')
+          return true;
+      }
+    }
+  }
+  return false;
 }
