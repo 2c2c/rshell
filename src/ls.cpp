@@ -10,11 +10,13 @@
 #include <list>
 #include <set>
 #include <ctype.h>
+
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
 
 // outputs parameters to the program for debugging
-void Output(std::list<std::string> input);
+void OutputElements(std::list<std::string> input);
+void OutputArgs(std::set<std::string> args);
 
 // grabbed from UserHostInfo from rshell.cpp
 // the gains from refactoring aren't worth bothering
@@ -22,12 +24,16 @@ std::string CurrentPwd();
 
 // iterate each character of each element with a - to look for unknown args
 bool UnknownArgs(std::list<std::string> input);
+
 std::set<std::string> Split(std::list<std::string> input);
+
 int main(int argc, char **argv) {
   auto input = GetInput(argc, argv);
-  Output(input);
-  if(UnknownArgs(input))
+  OutputElements(input);
+  if (UnknownArgs(input))
     std::cout << "oh no" << std::endl;
+  auto args = Split(input);
+  OutputArgs(args);
 
   //    DIR *test = opendir("test");
   //    readdir(test);
@@ -45,9 +51,11 @@ std::list<std::string> GetInput(int argc, char **argv) {
   }
   return input;
 }
-void Output(std::list<std::string> input) {
+void OutputElements(std::list<std::string> input) {
+  using namespace std;
+  cout << "inputs: " << endl;
   for (const auto &element : input)
-    std::cout << element << std::endl;
+    cout << element << endl;
 }
 
 std::string CurrentPwd() {
@@ -63,12 +71,12 @@ std::string CurrentPwd() {
 std::set<std::string> Split(std::list<std::string> input) {
   std::set<std::string> args;
   input.pop_front();
-  for (auto& item : input) {
+  for (auto &item : input) {
     if (item[0] == '-') {
       item.erase(item.begin());
-      for(const auto& letter : item) {
-        args.emplace(letter);
-        }
+      for (const auto &letter : item) {
+        args.insert(std::string(1, tolower(letter)));
+      }
     }
   }
   return args;
@@ -84,4 +92,10 @@ bool UnknownArgs(std::list<std::string> input) {
     }
   }
   return false;
+}
+void OutputArgs(std::set<std::string> args) {
+  using namespace std;
+  cout << "args: " << endl;
+  for (const auto &arg : args)
+    cout << arg << endl;
 }
