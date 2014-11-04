@@ -25,7 +25,7 @@ std::string CurrentPwd();
 // iterate each character of each element with a - to look for unknown args
 bool UnknownArgs(std::list<std::string> input);
 
-std::set<std::string> Split(std::list<std::string> input);
+std::set<std::string> Split(std::list<std::string>& input);
 
 int main(int argc, char **argv) {
   auto input = GetInput(argc, argv);
@@ -34,6 +34,23 @@ int main(int argc, char **argv) {
     std::cout << "oh no" << std::endl;
   auto args = Split(input);
   OutputArgs(args);
+  
+  OutputElements(input);
+
+
+/*
+ * This is a BARE BONES example of how to use opendir/readdir/closedir.  Notice
+ * that there is no error checking on these functions.  You MUST add error 
+ * checking yourself.
+ */
+
+//    std::string dirName = ".";
+//    DIR *dirp = opendir(dirName.c_str());
+//    dirent *direntp;
+//    while ((direntp = readdir(dirp)))
+//        std::cout << direntp->d_name << std::endl;  // use stat here to find attributes of file
+//    closedir(dirp);
+
 
   //    DIR *test = opendir("test");
   //    readdir(test);
@@ -57,7 +74,6 @@ void OutputElements(std::list<std::string> input) {
   for (const auto &element : input)
     cout << element << endl;
 }
-
 std::string CurrentPwd() {
   char *rawpwd = get_current_dir_name();
   if (rawpwd == NULL) {
@@ -68,7 +84,7 @@ std::string CurrentPwd() {
   delete rawpwd;
   return pwd;
 }
-std::set<std::string> Split(std::list<std::string> input) {
+std::set<std::string> Split(std::list<std::string>& input) {
   std::set<std::string> args;
   input.pop_front();
   for (auto &item : input) {
@@ -77,6 +93,14 @@ std::set<std::string> Split(std::list<std::string> input) {
       for (const auto &letter : item) {
         args.insert(std::string(1, tolower(letter)));
       }
+      //todo
+      item.erase(0);
+    }
+  }
+  for (auto itr = input.begin(); itr != input.end(); ++itr) {
+    if (itr->empty()) {
+      input.erase(itr);
+      --itr;
     }
   }
   return args;
