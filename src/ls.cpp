@@ -1,3 +1,4 @@
+#include <locale>
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -17,6 +18,7 @@
 std::list<std::string> GetInput(int argc, char **argcv);
 void StripDotfiles(std::list<std::string> &names);
 
+void Print(std::string file, std::set<std::string> args);
 // outputs parameters to the program for debugging
 void OutputElements(std::list<std::string> input);
 void OutputArgs(std::set<std::string> args);
@@ -41,8 +43,6 @@ int main(int argc, char **argv) {
 
   OutputElements(input);
 
-  struct stat *buf = new struct stat;
-  stat("test", buf);
 
   /*
    * This is a BARE BONES example of how to use opendir/readdir/closedir. Notice
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
    */
 
   std::string dirName = ".";
-  list<string> names;
+  vector<string> names;
   DIR *dirp = opendir(dirName.c_str());
   dirent *direntp;
   while ((direntp = readdir(dirp))) {
@@ -62,26 +62,10 @@ int main(int argc, char **argv) {
   closedir(dirp);
 
   sort(names.begin(), names.end(), std::locale("en_US.UTF-8"));
+  list<string> namelist;
+  std::copy(names.begin(),names.end(),std::back_inserter(namelist));
 
-  auto argcheck = args.find("a");
-  if (argcheck == args.end())
-    StripDotfiles(names);
-
-  bool longlist;
-  argcheck = args.find("l");
-  if (argcheck == args.end()) {
-    longlist = false;
-  } else {
-    longlist = true;
-  }
-  argcheck = args.find("R");
-  if (argcheck == args.end()) {
-
-  } else {
-    // recursive
-  }
-
-  std::cout << "excuse me" << std::endl;
+  OutputElements(namelist);
 
   //    DIR *test = opendir("test");
   //    readdir(test);
@@ -160,8 +144,37 @@ void StripDotfiles(std::list<std::string> &names) {
   nameitr++;
   nameitr++;
 
-  if ((*nameitr)[0] == '.') {
-    names.erase(nameitr);
-    --nameitr;
+  while (nameitr != names.end()) {
+    if ((*nameitr)[0] == '.') {
+      names.erase(nameitr);
+      --nameitr;
+    }
+    ++nameitr;
   }
+}
+
+
+void Print(std::string file, std::set<std::string> args) {
+  using namespace std;
+  auto argcheck = args.find("a");
+  if (argcheck == std::end(args))
+    StripDotfiles(namelist);
+  OutputElements(namelist);
+
+  bool longlist;
+  argcheck = args.find("l");
+  if (argcheck == std::end(args)) {
+    longlist = false;
+  } else {
+    longlist = true;
+  }
+  argcheck = args.find("R");
+  if (argcheck == std::end(args)) {
+    if(longlist==true) cout << " hello";
+
+  } else {
+    // recursive
+  }
+
+  std::cout << "excuse me" << std::endl;
 }
