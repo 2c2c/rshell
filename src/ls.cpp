@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <iomanip>
 #include <pwd.h>
 #include <grp.h>
 #include <locale>
@@ -16,13 +18,15 @@
 #include <ctype.h>
 #include <map>
 
+void NormalList(std::map<std::string, int, std::locale> files);
 // print single line of a longlist output
 std::string LongList(std::string file, size_t padding);
 // manages a directory of longlist output
-void LongListBundle(std::map<std::string,int, std::locale> files);
+void LongListBundle(std::map<std::string, int, std::locale> files);
+
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
-void StripDotfiles(std::map<std::string,int, std::locale> &names);
+void StripDotfiles(std::map<std::string, int, std::locale> &names);
 
 void Print(std::string file, std::set<std::string> args);
 // outputs parameters to the program for debugging
@@ -46,11 +50,10 @@ int main(int argc, char **argv) {
     exit(1);
   }
   auto args = Split(input);
-  //empty input case, append . so it works as current directory
-  if (input.empty()) 
+  // empty input case, append . so it works as current directory
+  if (input.empty())
     input.push_front(".");
   Print(input.front(), args);
-
 }
 
 std::list<std::string> GetInput(int argc, char **argv) {
@@ -117,11 +120,11 @@ void OutputArgs(std::set<std::string> args) {
   for (const auto &arg : args)
     cout << arg << endl;
 }
-void StripDotfiles(std::map<std::string,int, std::locale> &names) {
-  auto nameitr = names.begin();
+void StripDotfiles(std::map<std::string, int, std::locale> &names) {
   // iterate past . and ..
-  nameitr++;
-  nameitr++;
+  names.erase(names.begin());
+  names.erase(names.begin());
+  auto nameitr = names.begin();
 
   while (nameitr != names.end()) {
     if ((*nameitr).first[0] == '.') {
@@ -133,17 +136,25 @@ void StripDotfiles(std::map<std::string,int, std::locale> &names) {
 }
 void Print(std::string file, std::set<std::string> args) {
   using namespace std;
-  //append / to directory if it doesn't already have. makes concatenation
-  // simpler down the road
-  if (file.back() != '/')
-    file.push_back('/');
   map<string, int, std::locale> names(std::locale("en_US.UTF-8"));
   DIR *dirp = opendir(file.c_str());
+  if (errno != 0) {
+    perror("opendir error");
+    exit(1);
+  }
   dirent *direntp;
   while ((direntp = readdir(dirp))) {
+    if (errno != 0) {
+      perror("readdir error");
+      exit(1);
+    }
     names.emplace(make_pair(direntp->d_name, direntp->d_type));
   }
   closedir(dirp);
+  if (errno != 0) {
+    perror("closedir error");
+    exit(1);
+  }
 
   auto argcheck = args.find("a");
   if (argcheck == std::end(args))
@@ -158,35 +169,63 @@ void Print(std::string file, std::set<std::string> args) {
   }
   argcheck = args.find("R");
   if (argcheck == std::end(args)) {
-    if(longlist==true) {
+    if (longlist == true) {
       LongListBundle(names);
-    }else{}//else normal print 
-      
+    } else {
+      NormalList(names);
+    }
   } else {
     // recursive
+    cout << endl << file << ": " << endl;
+    if (longlist) {
+      LongListBundle(names);
+    } else {
+      NormalList(names);
+    }
+    // check empty filelist before compariing iterators
+    if (names.empty())
+      return;
+    auto itr = names.begin();
+    string append_dir;
+    while (!names.empty() && itr != names.end()) {
+      if (itr->second == DT_DIR) {
+        // append / to directory if it doesn't already have. makes concatenation
+        // simpler down the road
+        if (file.back() != '/')
+          file.push_back('/');
+        append_dir = itr->first;
+        names.erase(itr++);
+        Print(file + append_dir, args);
+      } else {
+        ++itr;
+      }
+    }
   }
-  std::cout << "excuse me" << std::endl;
 }
 std::string LongList(std::string file, size_t padding) {
   using namespace std;
   struct stat buf;
   lstat(file.c_str(), &buf);
+  if (errno != 0) {
+    perror("longlist lstat error");
+    exit(1);
+  }
 
   // filetype
   string filetype;
-  if (S_ISBLK(buf.st_mode ))
+  if (S_ISBLK(buf.st_mode))
     filetype = "b";
-  else if (S_ISCHR(buf.st_mode ))
+  else if (S_ISCHR(buf.st_mode))
     filetype = "c";
-  else if (S_ISFIFO(buf.st_mode ))
+  else if (S_ISFIFO(buf.st_mode))
     filetype = "f";
-  else if (S_ISREG(buf.st_mode ))
+  else if (S_ISREG(buf.st_mode))
     filetype = "-";
-  else if (S_ISDIR(buf.st_mode ))
+  else if (S_ISDIR(buf.st_mode))
     filetype = "d";
-  else if (S_ISLNK(buf.st_mode ))
+  else if (S_ISLNK(buf.st_mode))
     filetype = "l";
-  else if (S_ISSOCK(buf.st_mode ))
+  else if (S_ISSOCK(buf.st_mode))
     filetype = "s";
 
   // permissions
@@ -221,8 +260,16 @@ std::string LongList(std::string file, size_t padding) {
   // username and groupname
   struct passwd user;
   user = *getpwuid(buf.st_uid);
+  if (errno != 0) {
+    perror("pwuid error");
+    exit(1);
+  }
   struct group grp;
   grp = *getgrgid(buf.st_gid);
+  if (errno != 0) {
+    perror("groupid error");
+    exit(1);
+  }
 
   string username(user.pw_name);
   string groupname(grp.gr_name);
@@ -237,35 +284,86 @@ std::string LongList(std::string file, size_t padding) {
   string thetime(rawtime);
   // remove day of week + space e.g. 'Sat '
   thetime.erase(0, 4);
-  // remove the ':ss yyyy\n' piece of the date. this is 9 chars until the year 10000
+  // remove the ':ss yyyy\n' piece of the date. this is 9 chars until the year
+  // 10000
   thetime.erase(thetime.size() - 9);
 
   string merged_string = filetype + permissions + " " + links + " " + username +
-                         " " + groupname + " " + filesize + " " + thetime + " " +
-                         file + "\n";
+                         " " + groupname + " " + filesize + " " + thetime +
+                         " " + file + "\n";
   cout << merged_string;
   return merged_string;
 }
 
-void LongListBundle(std::map<std::string,int, std::locale> files) {
+void LongListBundle(std::map<std::string, int, std::locale> files) {
   using namespace std;
+  // return early if empty
+  if (files.empty()) {
+    cout << endl;
+    return;
+  }
+
   long largest_filesize = 0;
   long block_total = 0;
   for (const auto &file : files) {
     struct stat sizecheck;
     lstat(file.first.c_str(), &sizecheck);
+    if (errno != 0) {
+      perror("longlist lstat error");
+      exit(1);
+    }
     if (sizecheck.st_size > largest_filesize) {
       largest_filesize = sizecheck.st_size;
-      //TODO
-      if(file.first != "." || file.first != "..")
+      // TODO
+      if (file.first != "." || file.first != "..")
         block_total += sizecheck.st_blocks;
     }
   }
-  //Output total block size before doing individual longlist lines
-  //TODO: fix this the numbers don't match!
+  // Output total block size before doing individual longlist lines
+  // TODO: fix this the numbers don't match!
   cout << "total " << block_total << endl;
   string filesize_width = to_string(largest_filesize);
-  for (const auto& file : files) {
+  for (const auto &file : files) {
     string information = LongList(file.first, filesize_width.size());
+  }
+}
+// TODO columns based on filesize
+// width assumed as 80 col
+void NormalList(std::map<std::string, int, std::locale> files) {
+  using namespace std;
+  // fixed columnsize
+  // return early if empty
+  if (files.empty()) {
+    cout << endl;
+    return;
+  }
+  const size_t COLSIZE = 80;
+  size_t widest_file = 0;
+  for (const auto &pair : files) {
+    if (pair.first.size() > widest_file)
+      widest_file = pair.first.size();
+  }
+  size_t file_columns = COLSIZE / (widest_file + 2);
+  size_t count = 0;
+
+  // multirow case
+  if (file_columns < files.size()) {
+    for (const auto &pair : files) {
+      cout << setw(widest_file) << left << pair.first << "  ";
+      if (count == file_columns) {
+        cout << endl;
+        count = 0;
+        continue;
+      }
+      count++;
+    }
+    cout << endl;
+  }
+  // single row case
+  else {
+    for (const auto &pair : files) {
+      cout << pair.first << "  ";
+    }
+    cout << endl;
   }
 }
