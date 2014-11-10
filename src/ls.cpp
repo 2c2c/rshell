@@ -22,13 +22,14 @@ void NormalList(std::map<std::string, int, std::locale> files);
 // print single line of a longlist output
 std::string LongList(std::string file, size_t padding);
 // manages a directory of longlist output
-void LongListBundle(std::map<std::string, int, std::locale> files, std::string dir);
+void LongListBundle(std::map<std::string, int, std::locale> files,
+                    std::string dir);
 
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
 void StripDotfiles(std::map<std::string, int, std::locale> &names);
 
-void Print(std::string file, std::set<std::string> args);
+void Print(std::string file, std::set<std::string> args, bool multifile);
 // outputs parameters to the program for debugging
 void OutputElements(std::list<std::string> input);
 void OutputArgs(std::set<std::string> args);
@@ -53,7 +54,13 @@ int main(int argc, char **argv) {
   // empty input case, append . so it works as current directory
   if (input.empty())
     input.push_front(".");
-  Print(input.front(), args);
+  bool multifile;
+  for (auto &filearg : input) {
+    cout << filearg << ": " << endl;
+    if (input.size() > 1)
+      multifile = true;
+    Print(filearg, args, multifile);
+  }
 }
 
 std::list<std::string> GetInput(int argc, char **argv) {
@@ -134,7 +141,7 @@ void StripDotfiles(std::map<std::string, int, std::locale> &names) {
     ++nameitr;
   }
 }
-void Print(std::string file, std::set<std::string> args) {
+void Print(std::string file, std::set<std::string> args, bool multifile) {
   using namespace std;
   map<string, int, std::locale> names(std::locale("en_US.UTF-8"));
   DIR *dirp = opendir(file.c_str());
@@ -176,7 +183,8 @@ void Print(std::string file, std::set<std::string> args) {
     }
   } else {
     // recursive
-    cout << endl << file << ": " << endl;
+    if (!multifile)
+      cout << endl << file << ": " << endl;
     if (longlist) {
       LongListBundle(names, file);
     } else {
@@ -201,7 +209,7 @@ void Print(std::string file, std::set<std::string> args) {
           file.push_back('/');
         append_dir = itr->first;
         names.erase(itr++);
-        Print(file + append_dir, args);
+        Print(file + append_dir, args, false);
       } else {
         ++itr;
       }
@@ -294,14 +302,14 @@ std::string LongList(std::string file, size_t padding) {
   // 10000
   thetime.erase(thetime.size() - 9);
 
-  //erase prepended directories from filename
+  // erase prepended directories from filename
   auto last_slash = file.begin();
-  for(auto itr = file.begin(); itr != file.end(); ++itr) {
+  for (auto itr = file.begin(); itr != file.end(); ++itr) {
     if (*itr == '/') {
       last_slash = itr;
     }
   }
-  //the range is [first, last)
+  // the range is [first, last)
   last_slash++;
   file.erase(file.begin(), last_slash);
 
@@ -312,7 +320,8 @@ std::string LongList(std::string file, size_t padding) {
   return merged_string;
 }
 
-void LongListBundle(std::map<std::string, int, std::locale> files, std::string dir) {
+void LongListBundle(std::map<std::string, int, std::locale> files,
+                    std::string dir) {
   // append / to directory if it doesn't already have. makes concatenation
   // simpler down the road
   if (dir.back() != '/')
