@@ -22,7 +22,7 @@ void NormalList(std::map<std::string, int, std::locale> files);
 // print single line of a longlist output
 std::string LongList(std::string file, size_t padding);
 // manages a directory of longlist output
-void LongListBundle(std::map<std::string, int, std::locale> files);
+void LongListBundle(std::map<std::string, int, std::locale> files, std::string dir);
 
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
@@ -170,7 +170,7 @@ void Print(std::string file, std::set<std::string> args) {
   argcheck = args.find("R");
   if (argcheck == std::end(args)) {
     if (longlist == true) {
-      LongListBundle(names);
+      LongListBundle(names, file);
     } else {
       NormalList(names);
     }
@@ -178,14 +178,20 @@ void Print(std::string file, std::set<std::string> args) {
     // recursive
     cout << endl << file << ": " << endl;
     if (longlist) {
-      LongListBundle(names);
+      LongListBundle(names, file);
     } else {
       NormalList(names);
     }
     // check empty filelist before compariing iterators
     if (names.empty())
       return;
+
+    // if . / .. are in the list iterate over them
     auto itr = names.begin();
+    if (names.find(".") != names.end()) {
+      ++itr;
+      ++itr;
+    }
     string append_dir;
     while (!names.empty() && itr != names.end()) {
       if (itr->second == DT_DIR) {
@@ -288,6 +294,17 @@ std::string LongList(std::string file, size_t padding) {
   // 10000
   thetime.erase(thetime.size() - 9);
 
+  //erase prepended directories from filename
+  auto last_slash = file.begin();
+  for(auto itr = file.begin(); itr != file.end(); ++itr) {
+    if (*itr == '/') {
+      last_slash = itr;
+    }
+  }
+  //the range is [first, last)
+  last_slash++;
+  file.erase(file.begin(), last_slash);
+
   string merged_string = filetype + permissions + " " + links + " " + username +
                          " " + groupname + " " + filesize + " " + thetime +
                          " " + file + "\n";
@@ -295,7 +312,11 @@ std::string LongList(std::string file, size_t padding) {
   return merged_string;
 }
 
-void LongListBundle(std::map<std::string, int, std::locale> files) {
+void LongListBundle(std::map<std::string, int, std::locale> files, std::string dir) {
+  // append / to directory if it doesn't already have. makes concatenation
+  // simpler down the road
+  if (dir.back() != '/')
+    dir.push_back('/');
   using namespace std;
   // return early if empty
   if (files.empty()) {
@@ -307,14 +328,15 @@ void LongListBundle(std::map<std::string, int, std::locale> files) {
   long block_total = 0;
   for (const auto &file : files) {
     struct stat sizecheck;
-    lstat(file.first.c_str(), &sizecheck);
+    std::string path = dir + file.first;
+    lstat(path.c_str(), &sizecheck);
     if (errno != 0) {
       perror("longlist lstat error");
       exit(1);
     }
     if (sizecheck.st_size > largest_filesize) {
       largest_filesize = sizecheck.st_size;
-      // TODO
+      // TODO add path? fix the size in general
       if (file.first != "." || file.first != "..")
         block_total += sizecheck.st_blocks;
     }
@@ -324,7 +346,7 @@ void LongListBundle(std::map<std::string, int, std::locale> files) {
   cout << "total " << block_total << endl;
   string filesize_width = to_string(largest_filesize);
   for (const auto &file : files) {
-    string information = LongList(file.first, filesize_width.size());
+    string information = LongList(dir + file.first, filesize_width.size());
   }
 }
 // TODO columns based on filesize
