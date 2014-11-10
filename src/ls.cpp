@@ -329,7 +329,6 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
   using namespace std;
   // return early if empty
   if (files.empty()) {
-    cout << endl;
     return;
   }
 
@@ -365,7 +364,6 @@ void NormalList(std::map<std::string, int, std::locale> files) {
   // fixed columnsize
   // return early if empty
   if (files.empty()) {
-    cout << endl;
     return;
   }
   const size_t COLSIZE = 80;
