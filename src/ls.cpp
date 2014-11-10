@@ -16,7 +16,7 @@
 
 // puts the argv input from the program into a list
 std::list<std::string> GetInput(int argc, char **argcv);
-void StripDotfiles(std::list<std::string> &names);
+void StripDotfiles(std::map<std::string,int, std::locale> &names);
 
 void Print(std::string file, std::set<std::string> args);
 // outputs parameters to the program for debugging
@@ -44,28 +44,6 @@ int main(int argc, char **argv) {
   OutputElements(input);
 
 
-  /*
-   * This is a BARE BONES example of how to use opendir/readdir/closedir. Notice
-   * that there is no error checking on these functions.  You MUST add error
-   * checking yourself.
-   */
-
-  std::string dirName = ".";
-  vector<string> names;
-  DIR *dirp = opendir(dirName.c_str());
-  dirent *direntp;
-  while ((direntp = readdir(dirp))) {
-    names.push_back(direntp->d_name);
-    std::cout << direntp->d_name
-              << std::endl; // use stat here to find attributes of file
-  }
-  closedir(dirp);
-
-  sort(names.begin(), names.end(), std::locale("en_US.UTF-8"));
-  list<string> namelist;
-  std::copy(names.begin(),names.end(),std::back_inserter(namelist));
-
-  OutputElements(namelist);
 
   //    DIR *test = opendir("test");
   //    readdir(test);
@@ -138,28 +116,39 @@ void OutputArgs(std::set<std::string> args) {
   for (const auto &arg : args)
     cout << arg << endl;
 }
-void StripDotfiles(std::list<std::string> &names) {
+void StripDotfiles(std::map<std::string,int, std::locale> &names) {
   auto nameitr = names.begin();
   // iterate past . and ..
   nameitr++;
   nameitr++;
 
   while (nameitr != names.end()) {
-    if ((*nameitr)[0] == '.') {
+    if ((*nameitr).first[0] == '.') {
       names.erase(nameitr);
       --nameitr;
     }
     ++nameitr;
   }
 }
-
-
 void Print(std::string file, std::set<std::string> args) {
   using namespace std;
+  std::string dirName = file;
+  //append / to directory if none exists already
+  if (dirName.back() != '/')
+    dirName.push_back('/');
+  map<string, int, std::locale> names(std::locale("en_US.UTF-8"));
+  DIR *dirp = opendir(dirName.c_str());
+  dirent *direntp;
+  while ((direntp = readdir(dirp))) {
+    names.emplace(make_pair(direntp->d_name, direntp->d_type));
+    std::cout << direntp->d_name
+              << std::endl; // use stat here to find attributes of file
+  }
+  closedir(dirp);
+
   auto argcheck = args.find("a");
   if (argcheck == std::end(args))
-    StripDotfiles(namelist);
-  OutputElements(namelist);
+    StripDotfiles(names);
 
   bool longlist;
   argcheck = args.find("l");
@@ -175,6 +164,5 @@ void Print(std::string file, std::set<std::string> args) {
   } else {
     // recursive
   }
-
   std::cout << "excuse me" << std::endl;
 }
