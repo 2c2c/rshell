@@ -56,9 +56,12 @@ int main(int argc, char **argv) {
     input.push_front(".");
   bool multifile;
   for (auto &filearg : input) {
-    cout << filearg << ": " << endl;
-    if (input.size() > 1)
+    if (input.size() > 1) {
+      cout << filearg << ": " << endl;
       multifile = true;
+    }
+    else
+      multifile = false;
     Print(filearg, args, multifile);
   }
 }
