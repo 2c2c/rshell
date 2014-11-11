@@ -132,14 +132,16 @@ void OutputArgs(std::set<std::string> args) {
 }
 void StripDotfiles(std::map<std::string, int, std::locale> &names) {
   // iterate past . and ..
-  names.erase(names.begin());
-  names.erase(names.begin());
+  auto target = names.find(".");
+  names.erase(target);
+  target = names.find("..");
+  names.erase(target);
   auto nameitr = names.begin();
 
   while (nameitr != names.end()) {
     if ((*nameitr).first[0] == '.') {
       names.erase(nameitr);
-      --nameitr;
+      nameitr = names.begin();
     }
     ++nameitr;
   }
@@ -197,14 +199,13 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     if (names.empty())
       return;
 
-    // if . / .. are in the list iterate over them
     auto itr = names.begin();
-    if (names.find(".") != names.end()) {
-      ++itr;
-      ++itr;
-    }
     string append_dir;
     while (!names.empty() && itr != names.end()) {
+    // if . / .. are in the list iterate over them
+      if (itr->first == "." || itr->first == "..") {
+        ++itr;
+      }
       if (itr->second == DT_DIR) {
         // append / to directory if it doesn't already have. makes concatenation
         // simpler down the road
@@ -332,13 +333,15 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
   using namespace std;
   // return early if empty
   if (files.empty()) {
+    cout << "total 0" << endl;
     return;
   }
 
   long largest_filesize = 0;
   long block_total = 0;
+  long size_total = 0;
+  struct stat sizecheck;
   for (const auto &file : files) {
-    struct stat sizecheck;
     std::string path = dir + file.first;
     lstat(path.c_str(), &sizecheck);
     if (errno != 0) {
@@ -347,12 +350,13 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     }
     if (sizecheck.st_size > largest_filesize) {
       largest_filesize = sizecheck.st_size;
-      // TODO add path? fix the size in general
-      if (file.first != "." || file.first != "..")
-        block_total += sizecheck.st_size;
     }
+  cout << "blocksize" << sizecheck.st_blksize << endl;
+  cout << "num blocks" << sizecheck.st_blocks << endl;
+  size_total += sizecheck.st_size;
+  block_total += sizecheck.st_blocks;
   }
-  block_total /= 1024;
+  block_total/= 2;
   // Output total block size before doing individual longlist lines
   // TODO: fix this the numbers don't match!
   cout << "total " << block_total << endl;
