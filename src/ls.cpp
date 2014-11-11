@@ -349,9 +349,10 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
       largest_filesize = sizecheck.st_size;
       // TODO add path? fix the size in general
       if (file.first != "." || file.first != "..")
-        block_total += sizecheck.st_blocks;
+        block_total += sizecheck.st_size;
     }
   }
+  block_total /= 1024;
   // Output total block size before doing individual longlist lines
   // TODO: fix this the numbers don't match!
   cout << "total " << block_total << endl;
