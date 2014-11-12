@@ -146,6 +146,46 @@ void StripDotfiles(std::map<std::string, int, std::locale> &names) {
 }
 void Print(std::string file, std::set<std::string> args, bool multifile) {
   using namespace std;
+  // do flag checks
+  auto argcheck = args.find("a");
+  bool allfiles = (argcheck == std::end(args)) ? false : true;
+
+  argcheck = args.find("l");
+  bool longlist = (argcheck == std::end(args)) ? false : true;
+
+  argcheck = args.find("R");
+  bool recursive = (argcheck == std::end(args)) ? false : true;
+
+  //need to inspect file before opening with opendir
+  //if the file isn't a dir we print early and return
+  struct stat buf;
+  lstat(file.c_str(), &buf);
+  if (errno != 0) {
+    perror("lstat in nondir file read error");
+    exit(1);
+  }
+  if (!S_ISDIR(buf.st_mode)) {
+    map<string, int, std::locale> single_name(std::locale("en_US.UTF-8"));
+    auto last_slash = file.find_last_of('/',0);
+    string filename;
+    string directory;
+    if (last_slash == string::npos) {
+      filename = file;
+      directory = ".";
+    } else {
+      filename = file.substr(last_slash);
+      directory = file;
+      directory.erase(last_slash);
+    }
+
+    single_name.emplace(make_pair(filename, 1));
+    if (longlist)
+      LongListBundle(single_name,directory);
+    else 
+      NormalList(single_name,directory);
+  return;
+  }
+
   map<string, int, std::locale> names(std::locale("en_US.UTF-8"));
   DIR *dirp = opendir(file.c_str());
   if (errno != 0) {
@@ -166,23 +206,15 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     exit(1);
   }
 
-  auto argcheck = args.find("a");
-  if (argcheck == std::end(args))
+  // if -a flag strip name list of dotfiles
+  if (!allfiles)
     StripDotfiles(names);
 
-  bool longlist;
-  argcheck = args.find("l");
-  if (argcheck == std::end(args)) {
-    longlist = false;
-  } else {
-    longlist = true;
-  }
-  argcheck = args.find("R");
-  if (argcheck == std::end(args)) {
+  if (!recursive) {
     if (longlist == true) {
       LongListBundle(names, file);
     } else {
-      NormalList(names,file);
+      NormalList(names, file);
     }
   } else {
     // recursive
@@ -191,7 +223,7 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     if (longlist) {
       LongListBundle(names, file);
     } else {
-      NormalList(names,file);
+      NormalList(names, file);
     }
     // check empty filelist before compariing iterators
     if (names.empty())
@@ -336,7 +368,6 @@ std::string LongList(std::string file, size_t padding) {
   // 10000
   thetime.erase(thetime.size() - 9);
 
-
   string merged_string = filetype + permissions + " " + links + " " + username +
                          " " + groupname + " " + filesize + " " + thetime +
                          " " + foreground_color + background_color + file +
@@ -388,15 +419,15 @@ void NormalList(std::map<std::string, int, std::locale> files,
   if (dir.back() != '/')
     dir.push_back('/');
 
-  //quick and dirty color implementation
+  // quick and dirty color implementation
   size_t colorbuffer;
   vector<string> colorfiles;
-  for (const auto& pair : files) {
+  for (const auto &pair : files) {
     string full_path = dir + pair.first;
     struct stat buf;
     lstat(full_path.c_str(), &buf);
     if (errno != 0) {
-      perror("longlist lstat error");
+      perror("normallist lstat error");
       exit(1);
     }
     string foreground_color = "\x1b[32;1";
@@ -420,7 +451,8 @@ void NormalList(std::map<std::string, int, std::locale> files,
         foreground_color + background_color + pair.first + end_color;
 
     colorfiles.push_back(colored_filename);
-    colorbuffer = foreground_color.size() + background_color.size() + end_color.size();
+    colorbuffer =
+        foreground_color.size() + background_color.size() + end_color.size();
   }
 
   // fixed columnsize
@@ -452,14 +484,14 @@ void NormalList(std::map<std::string, int, std::locale> files,
         count = 0;
         continue;
       }
-      cout << left << setw(widest_file+colorbuffer) << file;
+      cout << left << setw(widest_file + colorbuffer) << file;
     }
     cout << left << endl;
   }
   // single row case
   else {
     for (const auto &file : colorfiles) {
-      cout << file<< "  ";
+      cout << file << "  ";
     }
     cout << endl;
   }
