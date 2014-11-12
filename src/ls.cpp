@@ -99,7 +99,6 @@ std::set<std::string> Split(std::list<std::string> &input) {
       for (const auto &letter : item) {
         args.insert(std::string(1, letter));
       }
-      // todo
       item.erase(0);
     }
   }
@@ -375,8 +374,6 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     block_total += sizecheck.st_blocks;
   }
   block_total /= 2;
-  // Output total block size before doing individual longlist lines
-  // TODO: fix this the numbers don't match!
   cout << "total " << block_total << endl;
   string filesize_width = to_string(largest_filesize);
   for (const auto &file : files) {
@@ -398,7 +395,10 @@ void NormalList(std::map<std::string, int, std::locale> files,
     string full_path = dir + pair.first;
     struct stat buf;
     lstat(full_path.c_str(), &buf);
-    //TODO PERROR
+    if (errno != 0) {
+      perror("longlist lstat error");
+      exit(1);
+    }
     string foreground_color = "\x1b[32;1";
     string end_color = "\x1b[0m";
     // default green
