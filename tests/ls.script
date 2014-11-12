@@ -1,0 +1,584 @@
+Script started on Tue 11 Nov 2014 10:45:20 PM PST
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #file a[Kparam tests
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #no file param
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls
+[32;1;49ma.out[0m            [34;1;49mbin[0m              [39;1;49mLICENSE[0m          [39;1;49mMakefile[0m
+[39;1;49mREADME.md[0m        [34;1;49msrc[0m              [39;1;49mtest.cpp[0m         [34;1;49mtesting_grounds[0m
+[34;1;49mtests[0m            
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #single file params, [K[K: directory or file
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls[K[K[K[K[K[Kbin/ls LICENSE
+[39;1;49mLICENSE[0m  
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls a.out
+[32;1;49ma.out[0m  
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls bin
+[32;1;49mcp[0m  [32;1;49mls[0m  [32;1;49mrshell[0m  
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #from outside relative directory
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin /[K[K/ls /home/c/dotfiles/
+[39;1;49mclang-format.py[0m  [34;1;49mcolors[0m  [39;1;49mxmonad.hs[0m  
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #multiplee[K file param inputs
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls /home/c/dotfiles/ bin/ src/
+cp.cpp       ls.cpp       .ls.cpp.swp  rshell.cpp   Timer.h      
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls /home/c/dotfiles/ bin/ src/
+/home/c/dotfiles/: 
+[39;1;49mclang-format.py[0m  [34;1;49mcolors[0m  [39;1;49mxmonad.hs[0m  
+bin/: 
+[32;1;49mcp[0m  [32;1;49mls[0m  [32;1;49mrshell[0m  
+src/: 
+[39;1;49mcp.cpp[0m  [39;1;49mls.cpp[0m  [39;1;49mrshell.cpp[0m  [39;1;49mTimer.h[0m  
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #arguments[K[K[K[K[K[K[K[K[Kflags
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #singel f[K[K[K[Kle flag inputs
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls -a
+[34;1;47m.[0m                [34;1;47m..[0m               [32;1;49ma.out[0m            [34;1;49mbin[0m
+[34;1;47m.git[0m             [39;1;47m.gitignore[0m       [39;1;49mLICENSE[0m          [39;1;49mMakefile[0m
+[39;1;49mREADME.md[0m        [34;1;49msrc[0m              [39;1;49mtest.cpp[0m         [34;1;49mtesting_grounds[0m
+[34;1;49mtests[0m            
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/ls -l
+total 312
+-rwxrwxr-x   1 c c 279297 Nov  9 17:54 [32;1ma.out[0m
+drwxrwxr-x   2 c c   4096 Nov 11 22:25 [34;1mbin[0m
+-rw-rw-r--   1 c c   1467 Oct 21 23:05 [0;1mLICENSE[0m
+-rw-rw-r--   1 c c    291 Nov  5 21:24 [0;1mMakefile[0m
+-rw-rw-r--   1 c c   2994 Oct 21 23:17 [0;1mREADME.md[0m
+drwxrwxr-x   2 c c   4096 Nov 11 22:30 [34;1msrc[0m
+-rw-rw-r--   1 c c   4957 Nov  9 17:01 [0;1mtest.cpp[0m
+drwxrwxr-x   2 c c   4096 Nov 11 22:38 [34;1mtesting_grounds[0m
+drwxrwxr-x   2 c c   4096 Nov 11 22:45 [34;1mtests[0m
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin [K/ls [K[K[K[K[K[K[Kib[K[Kbin [K[K[K[Kbin/ls [K[K[K[K[K[K[K#moving[K[K[K[K[K[K[Kcd ~/cp
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ l[Kbin[K[K[K#move directory for clear recursive output ..
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ bin/ls -R
+bash: bin/ls: No such file or directory
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #oops
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ~/s[Krshell/bin/ls -R
+
+.: 
+[39;1;49m01234567890123456789012345678901234567[0m
+[39;1;49m0123456789012345678901234567890123456701234567890123456789012345678901234567[0m
+[32;1;49ma.out[0m
+[39;1;49mcp.cpp[0m
+[39;1;49me[0m
+[39;1;49mi[0m
+[36;1;49mlink[0m
+[39;1;49mo[0m
+[34;1;49moh[0m
+[39;1;49mq[0m
+[39;1;49mr[0m
+[39;1;49mt[0m
+[34;1;49mtest[0m
+[34;1;49mtest2[0m
+[39;1;49mTimer.h[0m
+[39;1;49mu[0m
+[39;1;49mw[0m
+[39;1;49my[0m
+
+
+./oh: 
+[34;1;49mmy[0m  
+
+./oh/my: 
+[34;1;49mgod[0m  
+
+./oh/my/god: 
+
+./test: 
+
+./test2: 
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #note co[K[Kcol[K[K[K[K[K[K[K[Koutput assumes colum[K[K[K[K[Kterminal of sie[Kze 80, so large files like this will quickly brre[Keak[K[K[K[Keak[K[K[K[K[Kruin wordwrap ping
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ rm 01234567890123456789012345678901234567
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ rm 0123456789012345678901234567890123456701234567890123456789012345678901234567 
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #mixe[K[K[K[Kflags: [K[K[K[K[K[K[Kmixing flags
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ bi[K[K~/rshell/bin/ls  [Klr[Ka[K[K-la
+total 196
+drwxrwxr-x   6 c c   4096 Nov 11 22:51 [34;1;47m.[0m
+drwxr-xr-x  32 c c   4096 Nov 11 21:08 [34;1;47m..[0m
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+drwxrwxr-x   8 c c   4096 Nov  3 23:24 [34;1;47m.git[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ bin[K[K[K~/rshell/bin/ls -la[KR
+
+.: 
+total 184
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+
+./oh: 
+total 4
+drwxrwxr-x   3 c c 4096 Nov 10 01:44 [34;1mmy[0m
+
+./oh/my: 
+total 4
+drwxrwxr-x   2 c c 4096 Nov 10 01:44 [34;1mgod[0m
+
+./oh/my/god: 
+total 0
+
+./test: 
+total 0
+
+./test2: 
+total 0
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ~/rshell/bin/ls -lR[Kar[KR=[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K#can handle repetiti[K[K[K[Ktition in arguments and singl[K[K[K[K[K- [K[K[K[K[K[Kand intermix with the t[K[K[K[K[K[K[K[K[K[K[Ked with the different flag inputs:
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ls -l -l -l -la [Kaaaalal[1@b[1@i[1P[1P[1@~[1@/[1@b[1P[1@r[1@s[5@hell/[1@b[3@in/
+total 196
+drwxrwxr-x   6 c c   4096 Nov 11 22:51 [34;1;47m.[0m
+drwxr-xr-x  32 c c   4096 Nov 11 21:08 [34;1;47m..[0m
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+drwxrwxr-x   8 c c   4096 Nov  3 23:24 [34;1;47m.git[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ~/rshell/bin/ls -l -l -l -laaaaalal[K[K[K[K[K[K[K[K[K[K/.[K[K./[1@a[1@a[1@a[1@a[1@a[C[C[C[C[C[C[C[C[C[C[C[C[C -la -la -la -la -l[Kaaaal
+total 196
+drwxrwxr-x   6 c c   4096 Nov 11 22:51 [34;1;47m.[0m
+drwxr-xr-x  32 c c   4096 Nov 11 21:08 [34;1;47m..[0m
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+drwxrwxr-x   8 c c   4096 Nov  3 23:24 [34;1;47m.git[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ~/rshell/bin/ls -la -laaaa -l ./ -la -la -la -la -aaaal[20P -l -l -laaaaalal[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C#can handle repetition in arguments and intermixed with the different flag inputs:[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[47P~/rshell/bin/ls -l -l -l -laaaaalal[K[K[K[K[K# c[K[Kcan handle strange spacing [K
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #can handle strange spacing[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C~/rshell/bin/ls -la -laaaa -l ./ -la -la -la -la -aaaal[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[20P -l -l -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[C -laaaaalal[1@ [1@ [1P[1P[1P[1@-[1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1@ [1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P[1P
+total 196
+drwxrwxr-x   6 c c   4096 Nov 11 22:51 [34;1;47m.[0m
+drwxr-xr-x  32 c c   4096 Nov 11 21:08 [34;1;47m..[0m
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+drwxrwxr-x   8 c c   4096 Nov  3 23:24 [34;1;47m.git[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #i havent done -lRa yet because it t[Koutputs so much,[K, here it goes!
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #i havent done -lRa yet because it outputs so much, here it goes![C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Kbi[K[K~/rshell/bin/ls -lRA[Ka
+
+.: 
+total 196
+drwxrwxr-x   6 c c   4096 Nov 11 22:51 [34;1;47m.[0m
+drwxr-xr-x  32 c c   4096 Nov 11 21:08 [34;1;47m..[0m
+-rwxrwxr-x   1 c c 160262 Nov  3 22:25 [32;1ma.out[0m
+-rw-rw-r--   1 c c   5698 Nov  3 23:24 [0;1mcp.cpp[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1me[0m
+drwxrwxr-x   8 c c   4096 Nov  3 23:24 [34;1;47m.git[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mi[0m
+lrwxrwxrwx   1 c c      1 Nov  8 22:22 [36;1mlink[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mo[0m
+drwxrwxr-x   3 c c   4096 Nov 11 15:39 [34;1moh[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mq[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mr[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mt[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest[0m
+drwxrwxr-x   2 c c   4096 Nov 10 01:44 [34;1mtest2[0m
+-rw-rw-r--   1 c c   2699 Nov  3 20:07 [0;1mTimer.h[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mu[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1mw[0m
+-rw-rw-r--   1 c c      0 Nov 11 16:03 [0;1my[0m
+
+./.git: 
+total 56
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x   6 c c 4096 Nov 11 22:51 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mbranches[0m
+-rw-rw-r--   1 c c   14 Nov  3 23:24 [0;1mCOMMIT_EDITMSG[0m
+-rw-rw-r--   1 c c  251 Nov  3 16:25 [0;1mconfig[0m
+-rw-rw-r--   1 c c   73 Nov  3 16:25 [0;1mdescription[0m
+-rw-rw-r--   1 c c   23 Nov  3 16:25 [0;1mHEAD[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mhooks[0m
+-rw-rw-r--   1 c c  248 Nov  3 23:24 [0;1mindex[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1minfo[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1mlogs[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1mobjects[0m
+-rw-rw-r--   1 c c  107 Nov  3 16:25 [0;1mpacked-refs[0m
+drwxrwxr-x   5 c c 4096 Nov  3 16:25 [34;1mrefs[0m
+
+./.git/branches: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+
+./.git/hooks: 
+total 48
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-rwxrwxr-x   1 c c  452 Nov  3 16:25 [32;1mapplypatch-msg.sample[0m
+-rwxrwxr-x   1 c c  896 Nov  3 16:25 [32;1mcommit-msg.sample[0m
+-rwxrwxr-x   1 c c  189 Nov  3 16:25 [32;1mpost-update.sample[0m
+-rwxrwxr-x   1 c c  398 Nov  3 16:25 [32;1mpre-applypatch.sample[0m
+-rwxrwxr-x   1 c c 1642 Nov  3 16:25 [32;1mpre-commit.sample[0m
+-rwxrwxr-x   1 c c 1239 Nov  3 16:25 [32;1mprepare-commit-msg.sample[0m
+-rwxrwxr-x   1 c c 1352 Nov  3 16:25 [32;1mpre-push.sample[0m
+-rwxrwxr-x   1 c c 4898 Nov  3 16:25 [32;1mpre-rebase.sample[0m
+-rwxrwxr-x   1 c c 3611 Nov  3 16:25 [32;1mupdate.sample[0m
+
+./.git/info: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-rw-rw-r--   1 c c  240 Nov  3 16:25 [0;1mexclude[0m
+
+./.git/logs: 
+total 16
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-rw-rw-r--   1 c c 1519 Nov  3 23:24 [0;1mHEAD[0m
+drwxrwxr-x   4 c c 4096 Nov  3 16:25 [34;1mrefs[0m
+
+./.git/logs/refs: 
+total 16
+drwxrwxr-x   4 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mheads[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1mremotes[0m
+
+./.git/logs/refs/heads: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   4 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+-rw-rw-r--   1 c c 1519 Nov  3 23:24 [0;1mmaster[0m
+
+./.git/logs/refs/remotes: 
+total 12
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   4 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1morigin[0m
+
+./.git/logs/refs/remotes/origin: 
+total 16
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1;47m.[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+-rw-rw-r--   1 c c  173 Nov  3 16:25 [0;1mHEAD[0m
+-rw-rw-r--   1 c c  596 Nov  3 23:25 [0;1mmaster[0m
+
+./.git/objects: 
+total 124
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1m0c[0m
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1m15[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1m16[0m
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1m23[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1m27[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1m33[0m
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1m36[0m
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1m5c[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1m6d[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1m71[0m
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1m80[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:22 [34;1m81[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1m8d[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1m8f[0m
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1m9a[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1maa[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mad[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1mb4[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mb5[0m
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1mc5[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1md5[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1md9[0m
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1mdc[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1meb[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:22 [34;1med[0m
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1mf7[0m
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1mfd[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1minfo[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mpack[0m
+
+./.git/objects/0c: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 21:27 [0;1m36f82bc129b2e4ca766f3d690855193bba8a34[0m
+
+./.git/objects/15: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  154 Nov  3 22:28 [0;1m843e67da4300f96117e7c3e8d54beed28478ad[0m
+
+./.git/objects/16: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 20:19 [0;1m44f07703dd948b3ac71dcde6e393125dd3ba16[0m
+
+./.git/objects/23: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 19:08 [0;1mb027cbf85776d34eb7fbc8dbf297136a741f8e[0m
+
+./.git/objects/27: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  171 Nov  3 20:31 [0;1mef00a4fa7d0ad050a452422856b028d84bdfb8[0m
+
+./.git/objects/33: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 20:31 [0;1mc66631ab55e5a46518ff7815702a1eb0e113a1[0m
+
+./.git/objects/36: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c 1173 Nov  3 21:27 [0;1mcadf7db1266433d2a1369cbca9def6bb7fc41a[0m
+
+./.git/objects/5c: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c 1602 Nov  3 22:28 [0;1m4337356e6d23012cd7f793b1b6c275d7cdb2f6[0m
+
+./.git/objects/6d: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  533 Nov  3 16:25 [0;1ma916685f42289014c82873fa56d2765fdcc3f5[0m
+
+./.git/objects/71: 
+total 20
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 23:24 [0;1m20785b1e4f28f59e1861dbce310d1d75ed7fb9[0m
+-r--r--r--   1 c c  181 Nov  3 20:22 [0;1m60f67c55d268eb9dc73987b9e3c789cf737a07[0m
+-r--r--r--   1 c c 1601 Nov  3 23:23 [0;1me406fa6b278aa88b5a106e5a6e4624093ed8a8[0m
+
+./.git/objects/80: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 21:27 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  181 Nov  3 21:27 [0;1m36a40322b1cdb20a88c5cde2860b144c0e8833[0m
+
+./.git/objects/81: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:22 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 20:22 [0;1m2de1b1465595ff7bc16ac95713ac27506d6d84[0m
+
+./.git/objects/8d: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  184 Nov  3 20:19 [0;1mcd40ef7ff8532b50363f3e8309d2fecede2798[0m
+
+./.git/objects/8f: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  155 Nov  3 23:24 [0;1m57d591c7ec8d9c2b8b2d746393a0656418e470[0m
+
+./.git/objects/9a: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 22:28 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 22:28 [0;1m89e2690c101df33f2c97f87808dca98603fc77[0m
+
+./.git/objects/aa: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  104 Nov  3 23:24 [0;1m8348414d710adf4546b2ee53214487d7fd70b6[0m
+
+./.git/objects/ad: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  131 Nov  3 16:25 [0;1m32d22e0d7c51f6a491a1323321ebbacd0841ff[0m
+
+./.git/objects/b4: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:31 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c 1028 Nov  3 20:31 [0;1m14aae37da0ab1ad284c1cbda4d554a0020b1bb[0m
+
+./.git/objects/b5: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  601 Nov  3 16:25 [0;1m8390416daa83842d820bbed7cf46bc5b15f226[0m
+
+./.git/objects/c5: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  184 Nov  3 19:08 [0;1mf17e864f8ff505d6e18d56a0fbb0a9f10b8ab9[0m
+
+./.git/objects/d5: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c   77 Nov  3 16:25 [0;1m7360f607f2bf76251570101c478b86db4e4e4c[0m
+
+./.git/objects/d9: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  162 Nov  3 23:24 [0;1ma6cc7e9b70432de2ef849cd68b3c12414b8ca2[0m
+
+./.git/objects/dc: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  544 Nov  3 19:08 [0;1m06eded1830301a5f2419230df86aac00d0e953[0m
+
+./.git/objects/eb: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c 1599 Nov  3 23:24 [0;1mc133ae8c41302608ece76c25a76da1bfd5b6b3[0m
+
+./.git/objects/ed: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:22 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  995 Nov  3 20:22 [0;1mc8405dbe95324617fa23cecdc5fd462a9ddc99[0m
+
+./.git/objects/f7: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 20:19 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c 1000 Nov  3 20:19 [0;1m927577b7f8e98687b710af3b4acca25b7d51c7[0m
+
+./.git/objects/fd: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 19:08 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+-r--r--r--   1 c c  534 Nov  3 19:08 [0;1m3948b41924b7dac2bfa9e1481593d819c45d3e[0m
+
+./.git/objects/info: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+
+./.git/objects/pack: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x  31 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+
+./.git/refs: 
+total 20
+drwxrwxr-x   5 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   8 c c 4096 Nov  3 23:24 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1mheads[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1mremotes[0m
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1mtags[0m
+
+./.git/refs/heads: 
+total 12
+drwxrwxr-x   2 c c 4096 Nov  3 23:24 [34;1;47m.[0m
+drwxrwxr-x   5 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+-rw-rw-r--   1 c c   41 Nov  3 23:24 [0;1mmaster[0m
+
+./.git/refs/remotes: 
+total 12
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   5 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov  3 23:25 [34;1morigin[0m
+
+./.git/refs/remotes/origin: 
+total 16
+drwxrwxr-x   2 c c 4096 Nov  3 23:25 [34;1;47m.[0m
+drwxrwxr-x   3 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+-rw-rw-r--   1 c c   32 Nov  3 16:25 [0;1mHEAD[0m
+-rw-rw-r--   1 c c   41 Nov  3 23:25 [0;1mmaster[0m
+
+./.git/refs/tags: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov  3 16:25 [34;1;47m.[0m
+drwxrwxr-x   5 c c 4096 Nov  3 16:25 [34;1;47m..[0m
+
+./oh: 
+total 12
+drwxrwxr-x   3 c c 4096 Nov 11 15:39 [34;1;47m.[0m
+drwxrwxr-x   6 c c 4096 Nov 11 22:51 [34;1;47m..[0m
+drwxrwxr-x   3 c c 4096 Nov 10 01:44 [34;1mmy[0m
+
+./oh/my: 
+total 12
+drwxrwxr-x   3 c c 4096 Nov 10 01:44 [34;1;47m.[0m
+drwxrwxr-x   3 c c 4096 Nov 11 15:39 [34;1;47m..[0m
+drwxrwxr-x   2 c c 4096 Nov 10 01:44 [34;1mgod[0m
+
+./oh/my/god: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov 10 01:44 [34;1;47m.[0m
+drwxrwxr-x   3 c c 4096 Nov 10 01:44 [34;1;47m..[0m
+
+./test: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov 10 01:44 [34;1;47m.[0m
+drwxrwxr-x   6 c c 4096 Nov 11 22:51 [34;1;47m..[0m
+
+./test2: 
+total 8
+drwxrwxr-x   2 c c 4096 Nov 10 01:44 [34;1;47m.[0m
+drwxrwxr-x   6 c c 4096 Nov 11 22:51 [34;1;47m..[0m
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ k[Kls -l[K[K[K[K[K#improper flags break immediately
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ #improper flags break immediately[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[13P~/rshell/bin/ls -lRa[K[K[Kxla
+Unknown/unimplemented arg sent (not l, a or R)
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ ~/rshell/bin/ls -xla la-la
+Unknown/unimplemented arg sent (not l, a or R)
+]0;c@ubuntu: ~/cpc@ubuntu:~/cp$ r[Kexit
+Script done on Tue 11 Nov 2014 10:58:44 PM PST
