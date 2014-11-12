@@ -229,6 +229,24 @@ std::string LongList(std::string file, size_t padding) {
     exit(1);
   }
 
+  // erase prepended directories from filename
+  auto last_slash = file.begin();
+  for (auto itr = file.begin(); itr != file.end(); ++itr) {
+    if (*itr == '/') {
+      last_slash = itr;
+    }
+  }
+  // the range is [first, last)
+  last_slash++;
+  file.erase(file.begin(), last_slash);
+
+  // foreground color begins as green, if its a directory switch it to blue
+  // if we later find out the file isn't an executable strip the color
+  // the strange order is due to directories having the same file priviledges
+  // as executables
+  string foreground_color = "\x1b[32;1";
+  string end_color = "\x1b[0m";
+
   // filetype
   string filetype;
   if (S_ISBLK(buf.st_mode))
@@ -239,11 +257,13 @@ std::string LongList(std::string file, size_t padding) {
     filetype = "f";
   else if (S_ISREG(buf.st_mode))
     filetype = "-";
-  else if (S_ISDIR(buf.st_mode))
+  else if (S_ISDIR(buf.st_mode)) {
     filetype = "d";
-  else if (S_ISLNK(buf.st_mode))
+    foreground_color = "\x1b[34;1";
+  } else if (S_ISLNK(buf.st_mode)) {
     filetype = "l";
-  else if (S_ISSOCK(buf.st_mode))
+    foreground_color = "\x1b[36;1";
+  } else if (S_ISSOCK(buf.st_mode))
     filetype = "s";
 
   // permissions
@@ -266,6 +286,17 @@ std::string LongList(std::string file, size_t padding) {
     permissions[7] = 'w'; // others have write permission
   if (buf.st_mode & S_IXOTH)
     permissions[8] = 'x'; // others have execute permission
+
+  // strip the color if the file isn't an executable
+  if (!(permissions[2] == 'x' || permissions[5] == 'x' ||
+        permissions[8] == 'x')) {
+    foreground_color = "\x1b[0;1";
+  }
+
+  // background color is concatenated to foreground color eventually
+  // if there is no bg color fix the formatting for fg color
+  // else add bg color and close the color tag
+  string background_color = (file[0] == '.') ? ";47m" : "m";
 
   // num file links
   // giving 3 characters of space hardcoded for time purposes
@@ -306,20 +337,11 @@ std::string LongList(std::string file, size_t padding) {
   // 10000
   thetime.erase(thetime.size() - 9);
 
-  // erase prepended directories from filename
-  auto last_slash = file.begin();
-  for (auto itr = file.begin(); itr != file.end(); ++itr) {
-    if (*itr == '/') {
-      last_slash = itr;
-    }
-  }
-  // the range is [first, last)
-  last_slash++;
-  file.erase(file.begin(), last_slash);
 
   string merged_string = filetype + permissions + " " + links + " " + username +
                          " " + groupname + " " + filesize + " " + thetime +
-                         " " + file + "\n";
+                         " " + foreground_color + background_color + file +
+                         end_color + "\n";
   cout << merged_string;
   return merged_string;
 }
@@ -339,7 +361,6 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
 
   long largest_filesize = 0;
   long block_total = 0;
-  long size_total = 0;
   struct stat sizecheck;
   for (const auto &file : files) {
     std::string path = dir + file.first;
@@ -351,9 +372,6 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     if (sizecheck.st_size > largest_filesize) {
       largest_filesize = sizecheck.st_size;
     }
-    cout << "blocksize" << sizecheck.st_blksize << endl;
-    cout << "num blocks" << sizecheck.st_blocks << endl;
-    size_total += sizecheck.st_size;
     block_total += sizecheck.st_blocks;
   }
   block_total /= 2;
@@ -372,8 +390,8 @@ void NormalList(std::map<std::string, int, std::locale> files) {
   if (files.empty()) {
     return;
   }
-  //there are insecure ways of acquiring current terminal's column size
-  //that I am avoiding purposely
+  // there are insecure ways of acquiring current terminal's column size
+  // that I am avoiding purposely
   const size_t COLSIZE = 80;
   size_t widest_file = 0;
   for (const auto &pair : files) {
