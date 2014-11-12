@@ -1,0 +1,41 @@
+Script started on Tue 11 Nov 2014 11:23:36 PM PST
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #cp uses buffer method since it was measured fastest
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/cp README.md empty_dir/asdf[K[K[Klsd [K[K empty_dir/
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/cl[Kp README.md empty_dir/readme
+README.md
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ ls empty_dir/
+readme
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #same directory
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ cp README.md readme[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kls
+[0m[01;32ma.out[0m  [01;34mbin[0m  [01;34mempty_dir[0m  LICENSE  Makefile  README.md  [01;34msrc[0m  test.cpp  [01;34mtesting_grounds[0m  [01;34mtests[0m  typescript
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ cp RE[K[K[K[K[KLIC[K[K[Kbin/cp LICENSE license
+LICENSE
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ ls
+[0m[01;32ma.out[0m  [01;34mempty_dir[0m  LICENSE   README.md  test.cpp         [01;34mtests[0m
+[01;34mbin[0m    license    Makefile  [01;34msrc[0m        [01;34mtesting_grounds[0m  typescript
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #showing the actual benchmark (-b is[K[Kfor benchmark)
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/cp /usr/share/dd[Kict/american-english empty_dir/dictcopies
+/usr/share/dict/american-english
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #oops
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #oopsbin/cp /usr/share/dict/american-english empty_dir/dictcopies -b[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[15P#showing the actual benchmark (-b for benchmark)[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cbin/cp /usr/share/dict/american-english empty_dir/dictcopies -b[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C#oops[K[K[K[K[K[Krm empty_dir/dictcopies 
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ rm empty_dir/dictcopies [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C#oops[Kbin/cp /usr/share/dict/american-english empty_dir/dictcopies -b
+fstream: 0.018945
+/usr/share/dict/american-english
+unixsingle: 0.037018
+/usr/share/dict/american-english
+unixbuffer: 5.1e-05
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #buffer wins a[Kby a lot! -b works in every fp[K[Kfile position
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #buffer wins by a lot! -b works in every file position[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cbin/cp /usr/share/dict/american-english empty_dir/dictcopies -b[K[K[K-empty_dir/dictcopiesbempty_dir/dictcopies empty_dir/dictcopies
+fstream: 0.017639
+/usr/share/dict/american-english
+unixsingle: 0.056981
+/usr/share/dict/american-english
+unixbuffer: 5.3e-05
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/cp /usr/share/dict/american-english -b empty_dir/dictcopies[1P empty_dir/dictcopies[1P empty_dir/dictcopies[1Pempty_dir/dictcopies[C[1@-[1@b[1@ 
+fstream: 0.01418
+/usr/share/dict/american-english
+unixsingle: 0.073885
+/usr/share/dict/american-english
+unixbuffer: 5.6e-05
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
+Script done on Tue 11 Nov 2014 11:27:26 PM PST
