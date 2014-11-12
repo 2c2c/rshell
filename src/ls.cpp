@@ -59,8 +59,7 @@ int main(int argc, char **argv) {
     if (input.size() > 1) {
       cout << filearg << ": " << endl;
       multifile = true;
-    }
-    else
+    } else
       multifile = false;
     Print(filearg, args, multifile);
   }
@@ -202,9 +201,10 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     auto itr = names.begin();
     string append_dir;
     while (!names.empty() && itr != names.end()) {
-    // if . / .. are in the list iterate over them
+      // if . / .. are in the list iterate over them
       if (itr->first == "." || itr->first == "..") {
         ++itr;
+        continue;
       }
       if (itr->second == DT_DIR) {
         // append / to directory if it doesn't already have. makes concatenation
@@ -351,12 +351,12 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     if (sizecheck.st_size > largest_filesize) {
       largest_filesize = sizecheck.st_size;
     }
-  cout << "blocksize" << sizecheck.st_blksize << endl;
-  cout << "num blocks" << sizecheck.st_blocks << endl;
-  size_total += sizecheck.st_size;
-  block_total += sizecheck.st_blocks;
+    cout << "blocksize" << sizecheck.st_blksize << endl;
+    cout << "num blocks" << sizecheck.st_blocks << endl;
+    size_total += sizecheck.st_size;
+    block_total += sizecheck.st_blocks;
   }
-  block_total/= 2;
+  block_total /= 2;
   // Output total block size before doing individual longlist lines
   // TODO: fix this the numbers don't match!
   cout << "total " << block_total << endl;
@@ -365,8 +365,6 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     string information = LongList(dir + file.first, filesize_width.size());
   }
 }
-// TODO columns based on filesize
-// width assumed as 80 col
 void NormalList(std::map<std::string, int, std::locale> files) {
   using namespace std;
   // fixed columnsize
@@ -374,27 +372,33 @@ void NormalList(std::map<std::string, int, std::locale> files) {
   if (files.empty()) {
     return;
   }
+  //there are insecure ways of acquiring current terminal's column size
+  //that I am avoiding purposely
   const size_t COLSIZE = 80;
   size_t widest_file = 0;
   for (const auto &pair : files) {
     if (pair.first.size() > widest_file)
       widest_file = pair.first.size();
   }
-  size_t file_columns = COLSIZE / (widest_file + 2);
+  // adding 2 accounts for the guaranteed 2 spaces gap
+  widest_file += 2;
+  size_t file_columns = COLSIZE / (widest_file);
   size_t count = 0;
-
+  if (file_columns == 0) {
+    file_columns = 1;
+  }
   // multirow case
   if (file_columns < files.size()) {
     for (const auto &pair : files) {
-      cout << setw(widest_file) << left << pair.first << "  ";
+      count++;
       if (count == file_columns) {
-        cout << endl;
+        cout << left << pair.first << endl;
         count = 0;
         continue;
       }
-      count++;
+      cout << left << setw(widest_file) << pair.first;
     }
-    cout << endl;
+    cout << left << endl;
   }
   // single row case
   else {
