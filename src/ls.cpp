@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <map>
 
-void NormalList(std::map<std::string, int, std::locale> files);
+void NormalList(std::map<std::string, int, std::locale> files, std::string dir);
 // print single line of a longlist output
 std::string LongList(std::string file, size_t padding);
 // manages a directory of longlist output
@@ -183,7 +183,7 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     if (longlist == true) {
       LongListBundle(names, file);
     } else {
-      NormalList(names);
+      NormalList(names,file);
     }
   } else {
     // recursive
@@ -192,7 +192,7 @@ void Print(std::string file, std::set<std::string> args, bool multifile) {
     if (longlist) {
       LongListBundle(names, file);
     } else {
-      NormalList(names);
+      NormalList(names,file);
     }
     // check empty filelist before compariing iterators
     if (names.empty())
@@ -348,11 +348,11 @@ std::string LongList(std::string file, size_t padding) {
 
 void LongListBundle(std::map<std::string, int, std::locale> files,
                     std::string dir) {
+  using namespace std;
   // append / to directory if it doesn't already have. makes concatenation
   // simpler down the road
   if (dir.back() != '/')
     dir.push_back('/');
-  using namespace std;
   // return early if empty
   if (files.empty()) {
     cout << "total 0" << endl;
@@ -383,8 +383,46 @@ void LongListBundle(std::map<std::string, int, std::locale> files,
     string information = LongList(dir + file.first, filesize_width.size());
   }
 }
-void NormalList(std::map<std::string, int, std::locale> files) {
+void NormalList(std::map<std::string, int, std::locale> files,
+                std::string dir) {
   using namespace std;
+  // append / to directory if it doesn't already have. makes concatenation
+  // simpler down the road
+  if (dir.back() != '/')
+    dir.push_back('/');
+
+  //quick and dirty color implementation
+  size_t colorbuffer;
+  vector<string> colorfiles;
+  for (const auto& pair : files) {
+    string full_path = dir + pair.first;
+    struct stat buf;
+    lstat(full_path.c_str(), &buf);
+    //TODO PERROR
+    string foreground_color = "\x1b[32;1";
+    string end_color = "\x1b[0m";
+    // default green
+    if (S_ISLNK(buf.st_mode)) {
+      foreground_color = "\x1b[36;1";
+    } else if (S_ISDIR(buf.st_mode)) {
+      // blue
+      foreground_color = "\x1b[34;1";
+    }
+
+    if (!(buf.st_mode & S_IXUSR || buf.st_mode & S_IXGRP ||
+          buf.st_mode & S_IXOTH)) {
+      foreground_color = "\x1b[39;1";
+    }
+
+    string background_color = (pair.first[0] == '.') ? ";47m" : ";49m";
+
+    string colored_filename =
+        foreground_color + background_color + pair.first + end_color;
+
+    colorfiles.push_back(colored_filename);
+    colorbuffer = foreground_color.size() + background_color.size() + end_color.size();
+  }
+
   // fixed columnsize
   // return early if empty
   if (files.empty()) {
@@ -407,21 +445,21 @@ void NormalList(std::map<std::string, int, std::locale> files) {
   }
   // multirow case
   if (file_columns < files.size()) {
-    for (const auto &pair : files) {
+    for (const auto &file : colorfiles) {
       count++;
       if (count == file_columns) {
-        cout << left << pair.first << endl;
+        cout << left << file << endl;
         count = 0;
         continue;
       }
-      cout << left << setw(widest_file) << pair.first;
+      cout << left << setw(widest_file+colorbuffer) << file;
     }
     cout << left << endl;
   }
   // single row case
   else {
-    for (const auto &pair : files) {
-      cout << pair.first << "  ";
+    for (const auto &file : colorfiles) {
+      cout << file<< "  ";
     }
     cout << endl;
   }
