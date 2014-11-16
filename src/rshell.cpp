@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <algorithm>
 #include <boost/tokenizer.hpp>
 #include <iostream>
@@ -16,10 +17,13 @@
 
 const std::multimap<std::string, int> DEFINED_OPS = { std::make_pair("&", 2),
                                                       std::make_pair("|", 2),
-                                                      std::make_pair(";", 1) };
+                                                      std::make_pair(";", 1),
+                                                      std::make_pair("<", 1),
+                                                      std::make_pair(">", 2) };
 
-const std::vector<std::string> IMPLEMENTED_OPS{ "&&", "||", ";" };
+const std::vector<std::string> IMPLEMENTED_OPS{ "&&", "||", ";", "|", ">>", ">", "<" };
 
+void PeekForRedirection(std::list<std::string> &input);
 // handles what to do with finalized input state
 void Execute(std::list<std::string> &input);
 
@@ -57,7 +61,7 @@ bool FoundRepeat(const std::list<std::string> &input);
 bool InvalidRepeatOp(const std::list<std::string> &input,
                      std::pair<std::string, int> op);
 
-// helper function that calls RebuildOps with each element of global const
+// helper function that calls  with each element of global const
 // DEFINED_OPS as 2nd parameter (the single instances of & | ;)
 void CombineDefinedOps(std::list<std::string> &input);
 
@@ -148,7 +152,7 @@ std::list<std::string> Split(const std::string &input) {
   using namespace boost;
   using namespace std;
   list<string> input_split;
-  char_separator<char> sep(" ", "#&|;");
+  char_separator<char> sep(" ", "#&|;><");
   typedef tokenizer<char_separator<char> > tokener;
 
   tokener tokens(input, sep);
@@ -269,6 +273,11 @@ bool UseCommand(std::list<std::string> &input) {
   }
   // child state
   else if (pid == 0) {
+    //TODO search operators inplace of input vector?
+    if (!input.empty()) {
+      PeekForRedirection(input);
+    }
+    
     execvp(rawcommand[0], rawcommand);
     if (errno != 0) {
       perror("Error in execvp. Likely a nonexisting command?");
@@ -289,7 +298,6 @@ bool UseCommand(std::list<std::string> &input) {
     for (size_t i = 0; i < vectorcommand.size(); i++)
       delete[] rawcommand[i];
   }
-
   if (exitvalue == 0)
     return true;
   else
@@ -324,8 +332,8 @@ bool UseOperator(std::list<std::string> &input, bool prevcommandstate) {
   }
   // proper input ensures we never get down here, so im killing warning message
   // fixing this 'properly' would make it annoying to add more operators later
-  cout << "what in god's name" << endl;
-  return false;
+  //TODO make that not wrong^
+  return true;
 }
 void Execute(std::list<std::string> &input) {
   if (input.empty() || FoundRepeat(input) || FoundAdjOp(input))
@@ -334,8 +342,9 @@ void Execute(std::list<std::string> &input) {
   while (!input.empty()) {
     if (input.front() == "exit")
       exit(0);
-    if (cmdstate)
+    if (cmdstate) {
       cmdstate = UseCommand(input);
+      }
     else
       DumpCommand(input);
     cmdstate = UseOperator(input, cmdstate);
@@ -372,4 +381,26 @@ bool FoundAdjOp(std::list<std::string> &input) {
     }
   }
   return false;
+}
+void PeekForRedirection(std::list<std::string> &input) {
+  std::string op = input.front();
+  input.pop_front();
+  std::string target = input.front();
+  input.pop_front();
+  int fd = -1;
+  if (op == ">") {
+    fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+    close(1);
+    dup2(fd, 1);
+  }
+  else if (op == ">>") {
+    fd = open(target.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
+    close(1);
+    dup2(fd, 1);
+  }
+  else if (op == "<") {
+    fd = open(target.c_str(), O_RDONLY, 0644);
+    close(0);
+    dup2(fd, 0);
+  }
 }
