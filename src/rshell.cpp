@@ -15,6 +15,15 @@
 #include <vector>
 #include <pwd.h>
 
+enum class RedirectionTypes {
+  OUT_TRUNC,
+  OUT_APPEND,
+  IN,
+  PIPE,
+  NONE
+};
+
+void Redirect(RedirectionTypes r, std::string target);
 const std::multimap<std::string, int> DEFINED_OPS = { std::make_pair("&", 2),
                                                       std::make_pair("|", 2),
                                                       std::make_pair(";", 1),
@@ -23,7 +32,7 @@ const std::multimap<std::string, int> DEFINED_OPS = { std::make_pair("&", 2),
 
 const std::vector<std::string> IMPLEMENTED_OPS{ "&&", "||", ";", "|", ">>", ">", "<" };
 
-void PeekForRedirection(std::list<std::string> &input);
+RedirectionTypes PeekForRedirection(std::list<std::string> input);
 // handles what to do with finalized input state
 void Execute(std::list<std::string> &input);
 
@@ -266,6 +275,22 @@ bool UseCommand(std::list<std::string> &input) {
 
   char **rawcommand = &vectorcommand[0];
   int exitvalue = 0;
+
+  //look ahead for redirection operators
+  RedirectionTypes r = RedirectionTypes::NONE;
+  if (!input.empty()) {
+    r = PeekForRedirection(input);
+  }
+
+  //drop the operator + RHS of the redirection from input list
+  //if a redir op is found. has to be done from outside the fork
+  //or state isn't preserved in parent process
+  std::string target;
+  if (r != RedirectionTypes::NONE) {
+    input.pop_front();
+    target = input.front();
+    input.pop_front();
+  }
   auto pid = fork();
   if (pid == -1) {
     perror("Error on fork");
@@ -273,11 +298,7 @@ bool UseCommand(std::list<std::string> &input) {
   }
   // child state
   else if (pid == 0) {
-    //TODO search operators inplace of input vector?
-    if (!input.empty()) {
-      PeekForRedirection(input);
-    }
-    
+    Redirect(r, target);
     execvp(rawcommand[0], rawcommand);
     if (errno != 0) {
       perror("Error in execvp. Likely a nonexisting command?");
@@ -382,23 +403,36 @@ bool FoundAdjOp(std::list<std::string> &input) {
   }
   return false;
 }
-void PeekForRedirection(std::list<std::string> &input) {
+RedirectionTypes PeekForRedirection(std::list<std::string> input) {
   std::string op = input.front();
   input.pop_front();
   std::string target = input.front();
   input.pop_front();
-  int fd = -1;
   if (op == ">") {
+    return RedirectionTypes::OUT_TRUNC;
+  }
+  else if (op == ">>") {
+    return RedirectionTypes::OUT_APPEND;
+  }
+  else if (op == "<") {
+    return RedirectionTypes::IN;
+  }
+
+  return RedirectionTypes::NONE;
+}
+void Redirect(RedirectionTypes r, std::string target) {
+  int fd = -1;
+  if (r == RedirectionTypes::OUT_TRUNC) {
     fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
     close(1);
     dup2(fd, 1);
   }
-  else if (op == ">>") {
+  else if (r == RedirectionTypes::OUT_APPEND) {
     fd = open(target.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
     close(1);
     dup2(fd, 1);
   }
-  else if (op == "<") {
+ else if (r == RedirectionTypes::IN) {
     fd = open(target.c_str(), O_RDONLY, 0644);
     close(0);
     dup2(fd, 0);
