@@ -22,8 +22,9 @@ enum class RedirectionTypes {
   PIPE,
   NONE
 };
-
-void Redirect(RedirectionTypes r, std::string target);
+std::vector<char*> RebuildCommand(std::list<std::string> &input);
+std::list<std::string> InputSegment(std::list<std::string> &input);
+void Redirect(std::list<std::string> &input); 
 const std::multimap<std::string, int> DEFINED_OPS = { std::make_pair("&", 2),
                                                       std::make_pair("|", 2),
                                                       std::make_pair(";", 1),
@@ -259,53 +260,23 @@ bool UnimplementedOp(const std::list<std::string> &input, std::string op) {
 }
 bool UseCommand(std::list<std::string> &input) {
   using namespace std;
-
-  // Take list of strings, make copies of their c_strs, and put into vector
-  // a vector of char* can be used as char** if used as such
-  vector<char *> vectorcommand;
-  while (!input.empty() && !ContainsImplementedOp(input.front())) {
-    string transferstr = input.front();
-    input.pop_front();
-    char *cstrcopy = new char[transferstr.size() + 1];
-    memcpy(cstrcopy, transferstr.c_str(), transferstr.size() + 1);
-    cstrcopy[transferstr.size()] = 0;
-    vectorcommand.push_back(cstrcopy);
-  }
-  vectorcommand.push_back(NULL);
-
-  char **rawcommand = &vectorcommand[0];
   int exitvalue = 0;
 
-  //look ahead for redirection operators
-  RedirectionTypes r = RedirectionTypes::NONE;
-  if (!input.empty()) {
-    r = PeekForRedirection(input);
-  }
-
-  //drop the operator + RHS of the redirection from input list
-  //if a redir op is found. has to be done from outside the fork
-  //or state isn't preserved in parent process
-  std::string target;
-  if (r != RedirectionTypes::NONE) {
-    input.pop_front();
-    target = input.front();
-    input.pop_front();
-  }
+  auto segment = InputSegment(input);
   auto pid = fork();
+  cout << "countem: " << pid << endl;
   if (pid == -1) {
     perror("Error on fork");
     exit(1);
   }
   // child state
   else if (pid == 0) {
-    Redirect(r, target);
-    execvp(rawcommand[0], rawcommand);
+    cout << pid << endl;
+    Redirect(segment);
     if (errno != 0) {
       perror("Error in execvp. Likely a nonexisting command?");
       exit(1);
     }
-    for (size_t i = 0; i < vectorcommand.size(); i++)
-      delete[] rawcommand[i];
   }
   // parent
   else {
@@ -316,8 +287,6 @@ bool UseCommand(std::list<std::string> &input) {
       exit(1);
     }
     exitvalue = WEXITSTATUS(status);
-    for (size_t i = 0; i < vectorcommand.size(); i++)
-      delete[] rawcommand[i];
   }
   if (exitvalue == 0)
     return true;
@@ -357,6 +326,7 @@ bool UseOperator(std::list<std::string> &input, bool prevcommandstate) {
   return true;
 }
 void Execute(std::list<std::string> &input) {
+  std::cout << "exec" << std::endl;
   if (input.empty() || FoundRepeat(input) || FoundAdjOp(input))
     return;
   bool cmdstate = true;
@@ -420,21 +390,129 @@ RedirectionTypes PeekForRedirection(std::list<std::string> input) {
 
   return RedirectionTypes::NONE;
 }
-void Redirect(RedirectionTypes r, std::string target) {
-  int fd = -1;
-  if (r == RedirectionTypes::OUT_TRUNC) {
-    fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
-    close(1);
-    dup2(fd, 1);
+void Redirect(std::list<std::string> &input) {
+  using namespace std;
+  // Take list of strings, make copies of their c_strs, and put into vector
+  // a vector of char* can be used as char** if used as such
+  vector<char *> vectorcommand = RebuildCommand(input);
+  cout << "input: " << endl;
+  for (const auto ele : input)
+    cout << ele << endl;
+
+  cout << "veccmd: " << endl;
+  for (const auto ele : vectorcommand)
+    cout << ele << endl;
+
+  auto itr = input.begin();
+  while (itr != input.end()) {
+    int fd = -1;
+    if (*itr == ">") {
+      itr++;
+      auto target = *itr;
+      fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      close(1);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      dup2(fd, 1);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      continue;
+    } else if (*itr == ">>") {
+      itr++;
+      auto target = *itr;
+      fd = open(target.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      close(1);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      dup2(fd, 1);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      continue;
+    } else if (*itr == "<") {
+      itr++;
+      auto target = *itr;
+      fd = open(target.c_str(), O_RDONLY, 0644);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      close(0);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      dup2(fd, 0);
+      if (errno != 0) {
+        perror("Error in dup open or close. Likely a nonexisting command?");
+        exit(1);
+      }
+      continue;
+    }
+    else if (*itr == "|") {
+      
+
+
+
+    }
+    itr++;
   }
-  else if (r == RedirectionTypes::OUT_APPEND) {
-    fd = open(target.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
-    close(1);
-    dup2(fd, 1);
+  execvp(vectorcommand[0],&vectorcommand[0]);
+}
+
+std::list<std::string> InputSegment(std::list<std::string> &input) {
+  //[first, last) !
+  using namespace std;
+  auto stopping_point = input.begin();
+  stopping_point++;
+  while (stopping_point != input.end()) {
+    if (*stopping_point == ">" || *stopping_point == ">>" ||
+        *stopping_point == "<" || *stopping_point == "|") {
+      ;//idk man
+    } else if (*stopping_point == ";" || *stopping_point == "&&" ||
+               *stopping_point == "||") {
+      break;
+    }
+    stopping_point++;
   }
- else if (r == RedirectionTypes::IN) {
-    fd = open(target.c_str(), O_RDONLY, 0644);
-    close(0);
-    dup2(fd, 0);
+  list<string> segment(input.begin(), stopping_point);
+  cout << "segment: " << endl;
+  for (auto s : segment)
+    cout << s << " ";
+  cout<<endl<<"left_overs"<<endl;
+  list<string> left_overs(stopping_point, input.end());
+  for (auto l : left_overs)
+    cout << l << " ";
+  input = left_overs;
+
+  return segment;
+}
+std::vector<char*> RebuildCommand(std::list<std::string> &input) {
+  using namespace std;
+  vector<char *> vectorcommand;
+  while (!input.empty() && !ContainsImplementedOp(input.front())) {
+    string transferstr = input.front();
+    input.pop_front();
+    char *cstrcopy = new char[transferstr.size() + 1];
+    memcpy(cstrcopy, transferstr.c_str(), transferstr.size() + 1);
+    cstrcopy[transferstr.size()] = 0;
+    vectorcommand.push_back(cstrcopy);
   }
+  vectorcommand.push_back(NULL);
+  return vectorcommand;
 }
