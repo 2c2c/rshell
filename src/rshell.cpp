@@ -264,14 +264,12 @@ bool UseCommand(std::list<std::string> &input) {
 
   auto segment = InputSegment(input);
   auto pid = fork();
-  cout << "countem: " << pid << endl;
   if (pid == -1) {
     perror("Error on fork");
     exit(1);
   }
   // child state
   else if (pid == 0) {
-    cout << pid << endl;
     Redirect(segment);
     if (errno != 0) {
       perror("Error in execvp. Likely a nonexisting command?");
@@ -326,7 +324,6 @@ bool UseOperator(std::list<std::string> &input, bool prevcommandstate) {
   return true;
 }
 void Execute(std::list<std::string> &input) {
-  std::cout << "exec" << std::endl;
   if (input.empty() || FoundRepeat(input) || FoundAdjOp(input))
     return;
   bool cmdstate = true;
@@ -395,20 +392,12 @@ void Redirect(std::list<std::string> &input) {
   // Take list of strings, make copies of their c_strs, and put into vector
   // a vector of char* can be used as char** if used as such
   vector<char *> vectorcommand = RebuildCommand(input);
-  cout << "input: " << endl;
-  for (const auto ele : input)
-    cout << ele << endl;
 
-  cout << "veccmd: " << endl;
-  for (const auto ele : vectorcommand)
-    cout << ele << endl;
-
-  auto itr = input.begin();
-  while (itr != input.end()) {
+  while (!input.empty()) {
     int fd = -1;
-    if (*itr == ">") {
-      itr++;
-      auto target = *itr;
+    if (input.front() == ">") {
+      input.pop_front();
+      auto target = input.front();
       fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
@@ -425,9 +414,9 @@ void Redirect(std::list<std::string> &input) {
         exit(1);
       }
       continue;
-    } else if (*itr == ">>") {
-      itr++;
-      auto target = *itr;
+    } else if (input.front() == ">>") {
+      input.pop_front();
+      auto target = input.front();
       fd = open(target.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
@@ -444,9 +433,9 @@ void Redirect(std::list<std::string> &input) {
         exit(1);
       }
       continue;
-    } else if (*itr == "<") {
-      itr++;
-      auto target = *itr;
+    } else if (input.front() == "<") {
+      input.pop_front();
+      auto target = input.front();
       fd = open(target.c_str(), O_RDONLY, 0644);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
@@ -463,14 +452,37 @@ void Redirect(std::list<std::string> &input) {
         exit(1);
       }
       continue;
+    } else if (input.front() == "|") {
+      input.pop_front();
+
+      int pipe_fd[2];
+      pipe(pipe_fd);
+
+      auto pid = fork();
+      if (pid == 0) {
+        close(1);
+        dup2(pipe_fd[1], 1);
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        execvp(vectorcommand[0], &vectorcommand[0]);
+      } else {
+        close(0);
+        dup2(pipe_fd[0], 0);
+        close(pipe_fd[1]);
+        close(pipe_fd[0]);
+        auto pipecmd = RebuildCommand(input);
+
+        execvp(pipecmd[0], &pipecmd[0]);
+        int status;
+        auto wait_val = wait(&status);
+        if (wait_val == -1) {
+          perror("Error on waiting for child process to finish");
+          exit(1);
+        }
+      }
     }
-    else if (*itr == "|") {
-      
-
-
-
-    }
-    itr++;
+    input.pop_front();
+    // pop front ?
   }
   execvp(vectorcommand[0],&vectorcommand[0]);
 }
@@ -491,13 +503,7 @@ std::list<std::string> InputSegment(std::list<std::string> &input) {
     stopping_point++;
   }
   list<string> segment(input.begin(), stopping_point);
-  cout << "segment: " << endl;
-  for (auto s : segment)
-    cout << s << " ";
-  cout<<endl<<"left_overs"<<endl;
   list<string> left_overs(stopping_point, input.end());
-  for (auto l : left_overs)
-    cout << l << " ";
   input = left_overs;
 
   return segment;
