@@ -1,4 +1,6 @@
 #include <fcntl.h>
+#include <stdlib.h>
+#include <fstream>
 #include <algorithm>
 #include <boost/tokenizer.hpp>
 #include <iostream>
@@ -15,28 +17,19 @@
 #include <vector>
 #include <pwd.h>
 
-enum class RedirectionTypes {
-  OUT_TRUNC,
-  OUT_APPEND,
-  IN,
-  PIPE,
-  NONE
+void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
+int CountPipes(std::list<std::string> input);
+std::vector<char *> RebuildCommand(std::list<std::string> &input);
+std::list<std::string> InputSegment(std::list<std::string> &input);
+void Redirect(std::list<std::string> &input);
+const std::multimap<std::string, int> DEFINED_OPS = {
+  std::make_pair("&", 2), std::make_pair("|", 2), std::make_pair(";", 1),
+  std::make_pair("<", 3), std::make_pair(">", 2)
 };
 
-void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input);
-int CountPipes(std::list<std::string> input);
-std::vector<char*> RebuildCommand(std::list<std::string> &input);
-std::list<std::string> InputSegment(std::list<std::string> &input);
-void Redirect(std::list<std::string> &input); 
-const std::multimap<std::string, int> DEFINED_OPS = { std::make_pair("&", 2),
-                                                      std::make_pair("|", 2),
-                                                      std::make_pair(";", 1),
-                                                      std::make_pair("<", 1),
-                                                      std::make_pair(">", 2) };
+const std::vector<std::string> IMPLEMENTED_OPS{ "&&",  "||", ";", "|",
+                                                "<<<", ">>", ">", "<" };
 
-const std::vector<std::string> IMPLEMENTED_OPS{ "&&", "||", ";", "|", ">>", ">", "<" };
-
-RedirectionTypes PeekForRedirection(std::list<std::string> input);
 // handles what to do with finalized input state
 void Execute(std::list<std::string> &input);
 
@@ -319,7 +312,7 @@ bool UseOperator(std::list<std::string> &input, bool prevcommandstate) {
   }
   // proper input ensures we never get down here, so im killing warning message
   // fixing this 'properly' would make it annoying to add more operators later
-  //TODO make that not wrong^
+  // TODO make that not wrong^
   return true;
 }
 void Execute(std::list<std::string> &input) {
@@ -331,8 +324,7 @@ void Execute(std::list<std::string> &input) {
       exit(0);
     if (cmdstate) {
       cmdstate = UseCommand(input);
-      }
-    else
+    } else
       DumpCommand(input);
     cmdstate = UseOperator(input, cmdstate);
   }
@@ -369,23 +361,6 @@ bool FoundAdjOp(std::list<std::string> &input) {
   }
   return false;
 }
-RedirectionTypes PeekForRedirection(std::list<std::string> input) {
-  std::string op = input.front();
-  input.pop_front();
-  std::string target = input.front();
-  input.pop_front();
-  if (op == ">") {
-    return RedirectionTypes::OUT_TRUNC;
-  }
-  else if (op == ">>") {
-    return RedirectionTypes::OUT_APPEND;
-  }
-  else if (op == "<") {
-    return RedirectionTypes::IN;
-  }
-
-  return RedirectionTypes::NONE;
-}
 void Redirect(std::list<std::string> &input) {
   using namespace std;
   // Take list of strings, make copies of their c_strs, and put into vector
@@ -398,11 +373,6 @@ void Redirect(std::list<std::string> &input) {
       input.pop_front();
       auto target = input.front();
       fd = open(target.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
-      if (errno != 0) {
-        perror("Error in dup open or close. Likely a nonexisting command?");
-        exit(1);
-      }
-      close(1);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
         exit(1);
@@ -421,11 +391,6 @@ void Redirect(std::list<std::string> &input) {
         perror("Error in dup open or close. Likely a nonexisting command?");
         exit(1);
       }
-      close(1);
-      if (errno != 0) {
-        perror("Error in dup open or close. Likely a nonexisting command?");
-        exit(1);
-      }
       dup2(fd, 1);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
@@ -440,17 +405,60 @@ void Redirect(std::list<std::string> &input) {
         perror("Error in dup open or close. Likely a nonexisting command?");
         exit(1);
       }
-      close(0);
-      if (errno != 0) {
-        perror("Error in dup open or close. Likely a nonexisting command?");
-        exit(1);
-      }
       dup2(fd, 0);
       if (errno != 0) {
         perror("Error in dup open or close. Likely a nonexisting command?");
         exit(1);
       }
       continue;
+    } else if (input.front() == "<<<") {
+      fd = open(".asdfasdf1213123", O_CREAT | O_RDWR | O_TRUNC, 0644);
+      if (errno != 0) {
+        perror("creat error");
+        exit(1);
+      }
+      string merged_str;
+      // pop <<< op
+      input.pop_front();
+      while (input.front()[input.front().size() - 1] != '\"') {
+        merged_str += input.front();
+        if (merged_str[0] == '\"')
+          merged_str.erase(merged_str.begin());
+        merged_str += " ";
+        input.pop_front();
+      }
+      merged_str += input.front();
+      // remove "
+      if (merged_str[0] == '\"')
+        merged_str.erase(merged_str.begin());
+      merged_str.pop_back();
+      merged_str += "\n";
+      input.pop_front();
+      write(fd, merged_str.c_str(), merged_str.size());
+      if (errno != 0) {
+        perror("write error");
+        exit(1);
+      }
+      close(fd);
+      if (errno != 0) {
+        perror("close postwrite failed in <<<");
+        exit(1);
+      }
+      fd = open(".asdfasdf1213123", O_RDWR, 0644);
+      if (errno != 0) {
+        perror("reopen in <<< failed");
+        exit(1);
+      }
+      dup2(fd, 0);
+      if (errno != 0) {
+        perror("error in dup");
+        exit(1);
+      }
+      remove(".asdfasdf1213123");
+      if (errno != 0) {
+        perror("remove failed");
+        exit(1);
+      }
     } else if (input.front() == "|") {
       ProcessPipes(vectorcommand, input);
     }
@@ -469,7 +477,7 @@ std::list<std::string> InputSegment(std::list<std::string> &input) {
   while (stopping_point != input.end()) {
     if (*stopping_point == ">" || *stopping_point == ">>" ||
         *stopping_point == "<" || *stopping_point == "|") {
-      ;//idk man
+      ; // idk man
     } else if (*stopping_point == ";" || *stopping_point == "&&" ||
                *stopping_point == "||") {
       break;
@@ -482,7 +490,7 @@ std::list<std::string> InputSegment(std::list<std::string> &input) {
 
   return segment;
 }
-std::vector<char*> RebuildCommand(std::list<std::string> &input) {
+std::vector<char *> RebuildCommand(std::list<std::string> &input) {
   using namespace std;
   vector<char *> vectorcommand;
   while (!input.empty() && !ContainsImplementedOp(input.front())) {
@@ -506,7 +514,8 @@ int CountPipes(std::list<std::string> input) {
   }
   return count;
 }
-void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
+void ProcessPipes(std::vector<char *> first_cmd,
+                  std::list<std::string> &input) {
   using namespace std;
   auto num_pipes = CountPipes(input);
   int status;
@@ -528,7 +537,7 @@ void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
   int count = 0;
 
   auto command = first_cmd;
-  //pop first pipe
+  // pop first pipe
   input.pop_front();
   while (!input.empty()) {
     // command has already been rebuilt initially, for the rest
@@ -543,14 +552,14 @@ void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
     }
     if (pid == 0) {
       if (count > 0) {
-        dup2(pipefds.get()[(count-1)*2], 0);
+        dup2(pipefds.get()[(count - 1) * 2], 0);
         if (errno != 0) {
           perror("error duping second pipe set");
           exit(1);
         }
       }
       if (count != num_pipes) {
-        dup2(pipefds.get()[(count*2)+1], 1);
+        dup2(pipefds.get()[(count * 2) + 1], 1);
         if (errno != 0) {
           perror("error duping first pipe set");
           exit(1);
@@ -559,9 +568,17 @@ void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
 
       for (int i = 0; i < 2 * num_pipes; i++) {
         close(pipefds.get()[i]);
+        if (errno != 0) {
+          perror("error closing pipes");
+          exit(1);
+        }
       }
 
       execvp(command[0], &command[0]);
+      if (errno != 0) {
+        perror("error execvp in pipeland");
+        exit(1);
+      }
     } else {
       count++;
     }
@@ -571,12 +588,20 @@ void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
       input.pop_front();
     }
   }
-  //back in parent, close everything up and wait
+  // back in parent, close everything up and wait
   for (int i = 0; i < 2 * num_pipes; i++) {
     close(pipefds.get()[i]);
+    if (errno != 0) {
+      perror("closing pipes in parentpipe");
+      exit(1);
+    }
   }
-  for (int i = 0; i < num_pipes+1; i++) {
+  for (int i = 0; i < num_pipes + 1; i++) {
     wait(&status);
+    if (errno != 0) {
+      perror("error waitin in parentpipe");
+      exit(1);
+    }
   }
   exit(status);
 }
