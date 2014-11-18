@@ -22,6 +22,9 @@ enum class RedirectionTypes {
   PIPE,
   NONE
 };
+
+void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input);
+int CountPipes(std::list<std::string> input);
 std::vector<char*> RebuildCommand(std::list<std::string> &input);
 std::list<std::string> InputSegment(std::list<std::string> &input);
 void Redirect(std::list<std::string> &input); 
@@ -271,10 +274,6 @@ bool UseCommand(std::list<std::string> &input) {
   // child state
   else if (pid == 0) {
     Redirect(segment);
-    if (errno != 0) {
-      perror("Error in execvp. Likely a nonexisting command?");
-      exit(1);
-    }
   }
   // parent
   else {
@@ -453,38 +452,13 @@ void Redirect(std::list<std::string> &input) {
       }
       continue;
     } else if (input.front() == "|") {
-      input.pop_front();
-
-      int pipe_fd[2];
-      pipe(pipe_fd);
-
-      auto pid = fork();
-      if (pid == 0) {
-        close(1);
-        dup2(pipe_fd[1], 1);
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-        execvp(vectorcommand[0], &vectorcommand[0]);
-      } else {
-        close(0);
-        dup2(pipe_fd[0], 0);
-        close(pipe_fd[1]);
-        close(pipe_fd[0]);
-        auto pipecmd = RebuildCommand(input);
-
-        execvp(pipecmd[0], &pipecmd[0]);
-        int status;
-        auto wait_val = wait(&status);
-        if (wait_val == -1) {
-          perror("Error on waiting for child process to finish");
-          exit(1);
-        }
-      }
+      ProcessPipes(vectorcommand, input);
     }
-    input.pop_front();
-    // pop front ?
+    if (!input.empty()) {
+      input.pop_front();
+    }
   }
-  execvp(vectorcommand[0],&vectorcommand[0]);
+  execvp(vectorcommand[0], &vectorcommand[0]);
 }
 
 std::list<std::string> InputSegment(std::list<std::string> &input) {
@@ -521,4 +495,88 @@ std::vector<char*> RebuildCommand(std::list<std::string> &input) {
   }
   vectorcommand.push_back(NULL);
   return vectorcommand;
+}
+
+int CountPipes(std::list<std::string> input) {
+  int count = 0;
+  for (const auto &e : input) {
+    if (e == "|") {
+      count++;
+    }
+  }
+  return count;
+}
+void ProcessPipes(std::vector<char*> first_cmd, std::list<std::string> &input) {
+  using namespace std;
+  auto num_pipes = CountPipes(input);
+  int status;
+  pid_t pid;
+
+  unique_ptr<int> pipefds(new int[2 * num_pipes]);
+  if (errno != 0) {
+    perror("error making pipefds");
+    exit(1);
+  }
+
+  for (int i = 0; i < num_pipes; i++) {
+    pipe(pipefds.get() + i * 2);
+    if (errno != 0) {
+      perror("error using pipe()");
+      exit(1);
+    }
+  }
+  int count = 0;
+
+  auto command = first_cmd;
+  //pop first pipe
+  input.pop_front();
+  while (!input.empty()) {
+    // command has already been rebuilt initially, for the rest
+    // must be done within loop
+    if (count > 0)
+      command = RebuildCommand(input);
+
+    pid = fork();
+    if (pid == -1) {
+      perror("u got issues");
+      exit(1);
+    }
+    if (pid == 0) {
+      if (count > 0) {
+        dup2(pipefds.get()[(count-1)*2], 0);
+        if (errno != 0) {
+          perror("error duping second pipe set");
+          exit(1);
+        }
+      }
+      if (count != num_pipes) {
+        dup2(pipefds.get()[(count*2)+1], 1);
+        if (errno != 0) {
+          perror("error duping first pipe set");
+          exit(1);
+        }
+      }
+
+      for (int i = 0; i < 2 * num_pipes; i++) {
+        close(pipefds.get()[i]);
+      }
+
+      execvp(command[0], &command[0]);
+    } else {
+      count++;
+    }
+    if (input.empty())
+      break;
+    if (input.front() == "|") {
+      input.pop_front();
+    }
+  }
+  //back in parent, close everything up and wait
+  for (int i = 0; i < 2 * num_pipes; i++) {
+    close(pipefds.get()[i]);
+  }
+  for (int i = 0; i < num_pipes+1; i++) {
+    wait(&status);
+  }
+  exit(status);
 }
