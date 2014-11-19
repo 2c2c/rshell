@@ -454,11 +454,6 @@ void Redirect(std::list<std::string> &input) {
         perror("error in dup");
         exit(1);
       }
-      remove(".asdfasdf1213123");
-      if (errno != 0) {
-        perror("remove failed");
-        exit(1);
-      }
     } else if (input.front() == "|") {
       ProcessPipes(vectorcommand, input);
     }

@@ -1,0 +1,115 @@
+Script started on Tue 18 Nov 2014 09:14:12 PM PST
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ bin/rshell 
+->c@ubuntu:~/rshell$ ls
+bin  LICENSE  Makefile	piping.cpp  README.md  src  temp  test.cpp  tests
+->c@ubuntu:~/rshell$ #single output
+->c@ubuntu:~/rshell$ echo hello > output
+->c@ubuntu:~/rshell$ cat output
+hello
+->c@ubuntu:~/rshell$ #single input
+->c@ubuntu:~/rshell$ cat < output
+hello
+->c@ubuntu:~/rshell$ #swing    ingle append
+->c@ubuntu:~/rshell$ echo hi >> output
+->c@ubuntu:~/rshell$ echo howru >> output
+->c@ubuntu:~/rshell$ cat output
+hello
+hi
+howru
+->c@ubuntu:~/rshell$ #sdin   iung   ngle pipe
+->c@ubuntu:~/rshell$ ls | wc -l
+10
+->c@ubuntu:~/rshell$ #i combined in  /output t
+->c@ubuntu:~/rshell$ cat < Makefile >anew     newmakefile
+->c@ubuntu:~/rshell$ cat newmakefile
+CXX=g++
+CXXFLAGS= -Wall -Werror -ansi -pedantic -std=c++11 -g
+
+all: bin rshell ls cp
+
+bin: 
+	[ -e bin ] || mkdir bin
+
+rshell:
+	$(CXX) $(CXXFLAGS) ./src/rshell.cpp -o bin/rshell
+ls:
+	$(CXX) $(CXXFLAGS) ./src/ls.cpp -o bin/ls
+cp:
+	$(CXX) $(CXXFLAGS) ./src/cp.cpp -o bin/cp
+
+clean:
+	rm -rf bin
+->c@ubuntu:~/rshell$ #multiple pipes              unlimited pipes
+->c@ubuntu:~/rshell$ ls -l | grep          
+bin  LICENSE  Makefile	newmakefile  output  piping.cpp  README.md  src  temp  test.cpp  tests
+->c@ubuntu:~/rshell$ ls -l | grep test | grep tests | cat | cat | wc
+      1       9      41
+->c@ubuntu:~/rshell$ ls -l | grep test | grep tests | cat | cat
+drwxrwxr-x 2 c c 4096 Nov 18 21:14 tests
+->c@ubuntu:~/rshell$ #  mixed reidr   dir and pipes
+->c@ubuntu:~/rshell$ cat < output              ls > output
+->c@ubuntu:~/rshell$ cat < output | tr A-Z a-z | grep TEST | cat | cat | cat | grep tests
+->c@ubuntu:~/rshell$ cat output
+bin
+LICENSE
+Makefile
+newmakefile
+output
+piping.cpp
+README.md
+src
+temp
+test.cpp
+tests
+->c@ubuntu:~/rshell$ cat < output | tr A-Z a-z
+bin
+license
+makefile
+newmakefile
+output
+piping.cpp
+readme.md
+src
+temp
+test.cpp
+tests
+->c@ubuntu:~/rshell$ ^[[A    cat < output | tr a-z A-Z | grep TEST | cat | cat | cat grep te  TEST         | grep TESTS
+TESTS
+->c@ubuntu:~/rshell$ #spacing is always unbreaking  a  able
+->c@ubuntu:~/rshell$ cat       < output |   cat       |cat  |cat   grepp  src
+src
+->c@ubuntu:~/rshell$ #extras
+->c@ubuntu:~/rshell$ # <<<  (assumes basic " " string input... im not r writing a full string parser for this)
+->c@ubuntu:~/rshell$ cat <<< "well hello there"
+well hello there
+->c@ubuntu:~/rshell$ cat <<< "onewordinput"
+onewordinput
+->c@ubuntu:~/rshell$ #my connectors still work w perfectly         
+->c@ubuntu:~/rshell$ cat < output |grep test ; ls ;s    pwd > pwd_out
+test.cpp
+tests
+bin  LICENSE  Makefile	newmakefile  output  piping.cpp  README.md  src  temp  test.cpp  tests
+->c@ubuntu:~/rshell$ ls
+bin  LICENSE  Makefile	newmakefile  output  piping.cpp  pwd_out  README.md  src  temp	test.cpp  tests
+->c@ubuntu:~/rshell$ cat pwd_out
+/home/c/rshell
+->c@ubuntu:~/rshell$ #fancy piping with conditions als
+->c@ubuntu:~/rshell$ cat <non    for   non_existing_file_that fails ||  grep ohwell || cat     echo my  myorstatementworks!                 _or_statements_work! _oh_boy
+Error in dup open or close. Likely a nonexisting command?: No such file or directory
+my_or_statements_work_oh_boy
+->c@ubuntu:~/rshell$ #oh and my pipings can             redd              redirections also behave as                              #spamming redirection works like bash does  
+->c@ubuntu:~/rshell$ cat >       echo > one > two > three > four                          which file          whle_   ich_file_is_it_In  in > one > two _ > three > four
+->c@ubuntu:~/rshell$ cat one
+->c@ubuntu:~/rshell$ cat two
+->c@ubuntu:~/rshell$ cat three
+->c@ubuntu:~/rshell$ cat four
+which_file_is_it_in
+->c@ubuntu:~/rshell$ #this shou   o  order should output nothing
+->c@ubuntu:~/rshell$ cat < four < three < two < one
+->c@ubuntu:~/rshell$ #this should be  out the w text
+->c@ubuntu:~/rshell$ cat < one < two < three < four
+which_file_is_it_in
+->c@ubuntu:~/rshell$ cat one     < one t << two     w  two > idk                     #granted most of it's useless, but it doesn't break and maintains behavior. ok im done
+->c@ubuntu:~/rshell$ exit
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
+Script done on Tue 18 Nov 2014 09:36:01 PM PST
