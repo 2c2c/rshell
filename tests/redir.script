@@ -110,6 +110,8 @@ which_file_is_it_in
 ->c@ubuntu:~/rshell$ cat < one < two < three < four
 which_file_is_it_in
 ->c@ubuntu:~/rshell$ cat one     < one t << two     w  two > idk                     #granted most of it's useless, but it doesn't break and maintains behavior. ok im done
+->c@ubuntu:~/rshell$ #oh and empty input and exit still work
+->c@ubuntu:~/rshell$ 
 ->c@ubuntu:~/rshell$ exit
 ]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
 Script done on Tue 18 Nov 2014 09:36:01 PM PST
