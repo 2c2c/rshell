@@ -462,6 +462,10 @@ void Redirect(std::list<std::string> &input) {
     }
   }
   execvp(vectorcommand[0], &vectorcommand[0]);
+  if (errno != 0) {
+    perror("error in execvp");
+    exit(1);
+  }
 }
 
 std::list<std::string> InputSegment(std::list<std::string> &input) {
