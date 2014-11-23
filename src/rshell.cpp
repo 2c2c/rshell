@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <stdlib.h>
@@ -27,7 +28,7 @@ const std::vector<std::string> IMPLEMENTED_OPS{ "&&",  "||", ";", "|",
                                                 "<<<", ">>", ">", "<" };
 
 
-void CustomExec(std::list<std::string> path);
+void CustomExec(std::vector<char*> command);
 std::list<std::string> PathDirectories();
 void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
 int CountPipes(std::list<std::string> input);
@@ -112,6 +113,11 @@ void RebuildOps(std::list<std::string> &input, std::string op);
 bool FoundAdjOp(std::list<std::string> &input);
 
 int main() {
+  using namespace std;
+  auto f = [](int) {
+    return;
+  };
+  signal(SIGINT,f);
   while (true) {
     auto cmd = Prompt();
     auto input = Split(cmd);
@@ -326,6 +332,11 @@ void Execute(std::list<std::string> &input) {
   while (!input.empty()) {
     if (input.front() == "exit")
       exit(0);
+    if (input.front() == "cd") {
+      input.pop_front();
+      chdir(input.front().c_str());
+      return;
+    }
     if (cmdstate) {
       cmdstate = UseCommand(input);
     } else
@@ -465,11 +476,7 @@ void Redirect(std::list<std::string> &input) {
       input.pop_front();
     }
   }
-  execvp(vectorcommand[0], &vectorcommand[0]);
-  if (errno != 0) {
-    perror("error in execvp");
-    exit(1);
-  }
+  CustomExec(vectorcommand);
 }
 
 std::list<std::string> InputSegment(std::list<std::string> &input) {
@@ -577,11 +584,7 @@ void ProcessPipes(std::vector<char *> first_cmd,
         }
       }
 
-      execvp(command[0], &command[0]);
-      if (errno != 0) {
-        perror("error execvp in pipeland");
-        exit(1);
-      }
+      CustomExec(command);
     } else {
       count++;
     }
@@ -629,8 +632,22 @@ std::list<std::string> PathDirectories() {
   }
   return pathlist;
 }
-void CustomExec(std::list<std::string> path, std::vector<char *> command) {
+void CustomExec(std::vector<char*> command) {
   using namespace std;
+  //check if command is a directory
+  string dirtest(command[0]);
+  auto found = dirtest.find("/");
+  if (found != string::npos) {
+    auto f = [](int){ exit(1); };
+    signal(SIGINT,f);
+    execv(command[0], &command[0]);
+    if (errno != 0) {
+      perror("execv error");
+      exit(1);
+    }
+  }
+  //otherwise proceed to check PATH
+  auto path = PathDirectories();
   for (const auto &dir : path) {
     auto dirp = opendir(dir.c_str());
     if (errno != 0) {
@@ -651,6 +668,8 @@ void CustomExec(std::list<std::string> path, std::vector<char *> command) {
         command.erase(command.begin());
         delete[] removeit;
         command.insert(command.begin(), combinedraw);
+        auto f = [](int){ exit(1); };
+        signal(SIGINT,f);
         execv(command[0], &command[0]);
         if (errno != 0) {
           perror("execv error");
@@ -659,4 +678,6 @@ void CustomExec(std::list<std::string> path, std::vector<char *> command) {
       }
     }
   }
+  cout << "command not found" << endl;
+  exit(1);
 }
