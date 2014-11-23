@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <dirent.h>
 #include <stdlib.h>
 #include <fstream>
 #include <algorithm>
@@ -17,11 +18,6 @@
 #include <vector>
 #include <pwd.h>
 
-void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
-int CountPipes(std::list<std::string> input);
-std::vector<char *> RebuildCommand(std::list<std::string> &input);
-std::list<std::string> InputSegment(std::list<std::string> &input);
-void Redirect(std::list<std::string> &input);
 const std::multimap<std::string, int> DEFINED_OPS = {
   std::make_pair("&", 2), std::make_pair("|", 2), std::make_pair(";", 1),
   std::make_pair("<", 3), std::make_pair(">", 2)
@@ -30,6 +26,14 @@ const std::multimap<std::string, int> DEFINED_OPS = {
 const std::vector<std::string> IMPLEMENTED_OPS{ "&&",  "||", ";", "|",
                                                 "<<<", ">>", ">", "<" };
 
+
+void CustomExec(std::list<std::string> path);
+std::list<std::string> PathDirectories();
+void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
+int CountPipes(std::list<std::string> input);
+std::vector<char *> RebuildCommand(std::list<std::string> &input);
+std::list<std::string> InputSegment(std::list<std::string> &input);
+void Redirect(std::list<std::string> &input);
 // handles what to do with finalized input state
 void Execute(std::list<std::string> &input);
 
@@ -603,4 +607,56 @@ void ProcessPipes(std::vector<char *> first_cmd,
     }
   }
   exit(status);
+}
+
+std::list<std::string> PathDirectories() {
+  using namespace std;
+  using namespace boost;
+  string path = getenv("PATH");
+  if (errno != 0) {
+    perror("Error in dup open or close. Likely a nonexisting command?");
+    exit(1);
+  }
+
+  char_separator<char> sep(":", "");
+  typedef tokenizer<char_separator<char> > tokener;
+
+  tokener tokens(path, sep);
+
+  list<string> pathlist;
+  for (const auto &tok : tokens) {
+    pathlist.push_back(tok);
+  }
+  return pathlist;
+}
+void CustomExec(std::list<std::string> path, std::vector<char *> command) {
+  using namespace std;
+  for (const auto &dir : path) {
+    auto dirp = opendir(dir.c_str());
+    if (errno != 0) {
+      perror("opendir error");
+      exit(1);
+    }
+    dirent *direntp;
+    while ((direntp = readdir(dirp))) {
+      if (errno != 0) {
+        perror("readdir error");
+        exit(1);
+      }
+      if (strcmp(direntp->d_name, command[0]) == 0) {
+        string combined = dir + "/" + command[0];
+        char *combinedraw = new char[combined.size() + 1];
+        strcpy(combinedraw, combined.c_str());
+        char *removeit = command[0];
+        command.erase(command.begin());
+        delete[] removeit;
+        command.insert(command.begin(), combinedraw);
+        execv(command[0], &command[0]);
+        if (errno != 0) {
+          perror("execv error");
+          exit(1);
+        }
+      }
+    }
+  }
 }
