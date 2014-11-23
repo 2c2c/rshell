@@ -17,11 +17,6 @@
 #include <vector>
 #include <pwd.h>
 
-void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
-int CountPipes(std::list<std::string> input);
-std::vector<char *> RebuildCommand(std::list<std::string> &input);
-std::list<std::string> InputSegment(std::list<std::string> &input);
-void Redirect(std::list<std::string> &input);
 const std::multimap<std::string, int> DEFINED_OPS = {
   std::make_pair("&", 2), std::make_pair("|", 2), std::make_pair(";", 1),
   std::make_pair("<", 3), std::make_pair(">", 2)
@@ -30,6 +25,12 @@ const std::multimap<std::string, int> DEFINED_OPS = {
 const std::vector<std::string> IMPLEMENTED_OPS{ "&&",  "||", ";", "|",
                                                 "<<<", ">>", ">", "<" };
 
+std::list<std::string> PathDirectories();
+void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
+int CountPipes(std::list<std::string> input);
+std::vector<char *> RebuildCommand(std::list<std::string> &input);
+std::list<std::string> InputSegment(std::list<std::string> &input);
+void Redirect(std::list<std::string> &input);
 // handles what to do with finalized input state
 void Execute(std::list<std::string> &input);
 
@@ -599,4 +600,8 @@ void ProcessPipes(std::vector<char *> first_cmd,
     }
   }
   exit(status);
+}
+
+std::list<std::string> PathDirectories() {
+
 }
