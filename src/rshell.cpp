@@ -603,5 +603,22 @@ void ProcessPipes(std::vector<char *> first_cmd,
 }
 
 std::list<std::string> PathDirectories() {
+  using namespace std;
+  using namespace boost;
+  string path = getenv("PATH");
+  if (errno != 0) {
+    perror("Error in dup open or close. Likely a nonexisting command?");
+    exit(1);
+  }
 
+  char_separator<char> sep(":", "");
+  typedef tokenizer<char_separator<char> > tokener;
+
+  tokener tokens(path, sep);
+
+  list<string> pathlist;
+  for (const auto &tok : tokens) {
+    pathlist.push_back(tok);
+  }
+  return pathlist;
 }
