@@ -336,6 +336,10 @@ void Execute(std::list<std::string> &input) {
     if (input.front() == "cd") {
       input.pop_front();
       chdir(input.front().c_str());
+      if (errno != 0) {
+        perror("error in chdir");
+        exit(1);
+      }
       return;
     }
     if (cmdstate) {
