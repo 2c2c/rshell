@@ -27,8 +27,7 @@ const std::multimap<std::string, int> DEFINED_OPS = {
 const std::vector<std::string> IMPLEMENTED_OPS{ "&&",  "||", ";", "|",
                                                 "<<<", ">>", ">", "<" };
 
-
-void CustomExec(std::vector<char*> command);
+void CustomExec(std::vector<char *> command);
 std::list<std::string> PathDirectories();
 void ProcessPipes(std::vector<char *> first_cmd, std::list<std::string> &input);
 int CountPipes(std::list<std::string> input);
@@ -114,10 +113,12 @@ bool FoundAdjOp(std::list<std::string> &input);
 
 int main() {
   using namespace std;
-  auto f = [](int) {
-    return;
-  };
-  signal(SIGINT,f);
+  auto f = [](int) { return; };
+  signal(SIGINT, f);
+
+  if (errno != 0) {
+    perror("signal failed");
+  }
   while (true) {
     auto cmd = Prompt();
     auto input = Split(cmd);
@@ -632,21 +633,21 @@ std::list<std::string> PathDirectories() {
   }
   return pathlist;
 }
-void CustomExec(std::vector<char*> command) {
+void CustomExec(std::vector<char *> command) {
   using namespace std;
-  //check if command is a directory
+  // check if command is a directory
   string dirtest(command[0]);
   auto found = dirtest.find("/");
   if (found != string::npos) {
-    auto f = [](int){ exit(1); };
-    signal(SIGINT,f);
+    auto f = [](int) { exit(1); };
+    signal(SIGINT, f);
     execv(command[0], &command[0]);
     if (errno != 0) {
       perror("execv error");
       exit(1);
     }
   }
-  //otherwise proceed to check PATH
+  // otherwise proceed to check PATH
   auto path = PathDirectories();
   for (const auto &dir : path) {
     auto dirp = opendir(dir.c_str());
@@ -668,8 +669,12 @@ void CustomExec(std::vector<char*> command) {
         command.erase(command.begin());
         delete[] removeit;
         command.insert(command.begin(), combinedraw);
-        auto f = [](int){ exit(1); };
-        signal(SIGINT,f);
+        auto f = [](int) { exit(1); };
+        signal(SIGINT, f);
+        if (errno != 0) {
+          perror("signal error");
+          exit(1);
+        }
         execv(command[0], &command[0]);
         if (errno != 0) {
           perror("execv error");
