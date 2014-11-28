@@ -115,7 +115,6 @@ int main() {
   using namespace std;
   auto f = [](int) { return; };
   signal(SIGINT, f);
-
   if (errno != 0) {
     perror("signal failed");
   }
@@ -645,6 +644,10 @@ void CustomExec(std::vector<char *> command) {
   if (found != string::npos) {
     auto f = [](int) { exit(1); };
     signal(SIGINT, f);
+      if (errno != 0) {
+        perror("signal error");
+        exit(1);
+      }
     execv(command[0], &command[0]);
     if (errno != 0) {
       perror("execv error");
