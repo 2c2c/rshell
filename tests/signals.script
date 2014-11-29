@@ -1,0 +1,118 @@
+Script started on Fri 28 Nov 2014 09:23:04 PM PST
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ clear
+[H[2J]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #PATH
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ #i[KI use execv() to handle manual path lookup for launching programs
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ i[Kbin/rshell
+->c@ubuntu:~/rshell$ ls
+a.out  bin  LICENSE  Makefile  piping.cpp  README.md  src  temp  test.cpp  tests
+->c@ubuntu:~/rshell$ which ls
+/bin/ls
+->c@ubuntu:~/rshell$ which which
+/usr/bin/which
+->c@ubuntu:~/rshell$ #if a   th  a / / is found within the first paramte  eter input to the shell it determines its a directory               the path isnt needed and manual directory lookup is reui                                                         
+->c@ubuntu:~/rshell$ #directory lookup is needed rather than any use of $ PATH
+->c@ubuntu:~/rshell$ bin/rshell
+->c@ubuntu:~/rshell$ exit
+->c@ubuntu:~/rshell$ #not   NOTE sti   still in rshell
+->c@ubuntu:~/rshell$ ##T  The C^ signal
+->c@ubuntu:~/rshell$ # CY ^ will not break of ut of the shell itself
+->c@ubuntu:~/rshell$ ^C
+->c@ubuntu:~/rshell$ ^C^C^C^C^C
+->c@ubuntu:~/rshell$ ^C^C^C^C^C^C^C^C
+->c@ubuntu:~/rshell$ #the only cosmetic difference is that it doesn't reoutput the line                              the signal doesn't reoutput the line, but tha' t's just a cosmetic differne  ence
+->c@ubuntu:~/rshell$ bin/cp /usr/share/dict/aa merican-english testcpy  opy -b                                                   #note it will still break out of programs
+->c@ubuntu:~/rshell$ top
+[?1h=[?25l[H[2J(B[mtop - 21:28:43 up 2 days,  6:22,  4 users,  load average: 0.00, 0.01, 0.05(B[m[39;49m(B[m[39;49m[K
+Tasks:(B[m[39;49m[1m 282 (B[m[39;49mtotal,(B[m[39;49m[1m   1 (B[m[39;49mrunning,(B[m[39;49m[1m 281 (B[m[39;49msleeping,(B[m[39;49m[1m   0 (B[m[39;49mstopped,(B[m[39;49m[1m   0 (B[m[39;49mzombie(B[m[39;49m(B[m[39;49m[K
+%Cpu(s):(B[m[39;49m[1m  0.3 (B[m[39;49mus,(B[m[39;49m[1m  0.1 (B[m[39;49msy,(B[m[39;49m[1m  0.0 (B[m[39;49mni,(B[m[39;49m[1m 99.5 (B[m[39;49mid,(B[m[39;49m[1m  0.2 (B[m[39;49mwa,(B[m[39;49m[1m  0.0 (B[m[39;49mhi,(B[m[39;49m[1m  0.0 (B[m[39;49msi,(B[m[39;49m[1m  0.0 (B[m[39;49mst(B[m[39;49m(B[m[39;49m[K
+KiB Mem: (B[m[39;49m[1m  1010436 (B[m[39;49mtotal,(B[m[39;49m[1m   760296 (B[m[39;49mused,(B[m[39;49m[1m   250140 (B[m[39;49mfree,(B[m[39;49m[1m    36840 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
+KiB Swap:(B[m[39;49m[1m  1046524 (B[m[39;49mtotal,(B[m[39;49m[1m     6932 (B[m[39;49mused,(B[m[39;49m[1m  1039592 (B[m[39;49mfree.(B[m[39;49m[1m   274128 (B[m[39;49mcached Mem(B[m[39;49m(B[m[39;49m[K
+[K
+[7m  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND                                                                                                                     (B[m[39;49m[K
+(B[m[1m36671 c         20   0   32312   1660   1064 R  5.4  0.2   0:00.09 top                                                                                                                         (B[m[39;49m[K
+(B[m    1 root      20   0   33804   2924   1468 S  0.0  0.3   0:04.80 init                                                                                                                        (B[m[39;49m[K
+(B[m    2 root      20   0       0      0      0 S  0.0  0.0   0:00.01 kthreadd                                                                                                                    (B[m[39;49m[K
+(B[m    3 root      20   0       0      0      0 S  0.0  0.0   0:00.88 ksoftirqd/0                                                                                                                 (B[m[39;49m[K
+(B[m    4 root      20   0       0      0      0 S  0.0  0.0   0:00.00 kworker/0:0                                                                                                                 (B[m[39;49m[K
+(B[m    5 root       0 -20       0      0      0 S  0.0  0.0   0:00.00 kworker/0:0H                                                                                                                (B[m[39;49m[K
+(B[m    7 root      20   0       0      0      0 S  0.0  0.0   0:02.49 rcu_sched                                                                                                                   (B[m[39;49m[K
+(B[m    8 root      20   0       0      0      0 S  0.0  0.0   0:02.77 rcuos/0                                                                                                                     (B[m[39;49m[K
+(B[m    9 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/1                                                                                                                     (B[m[39;49m[K
+(B[m   10 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/2                                                                                                                     (B[m[39;49m[K
+(B[m   11 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/3                                                                                                                     (B[m[39;49m[K
+(B[m   12 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/4                                                                                                                     (B[m[39;49m[K
+(B[m   13 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/5                                                                                                                     (B[m[39;49m[K
+(B[m   14 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/6                                                                                                                     (B[m[39;49m[K
+(B[m   15 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/7                                                                                                                     (B[m[39;49m[K
+(B[m   16 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/8                                                                                                                     (B[m[39;49m[K
+(B[m   17 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/9                                                                                                                     (B[m[39;49m[K
+(B[m   18 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/10                                                                                                                    (B[m[39;49m[K
+(B[m   19 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/11                                                                                                                    (B[m[39;49m[K
+(B[m   20 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/12                                                                                                                    (B[m[39;49m[K
+(B[m   21 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/13                                                                                                                    (B[m[39;49m[K
+(B[m   22 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/14                                                                                                                    (B[m[39;49m[K
+(B[m   23 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/15                                                                                                                    (B[m[39;49m[K
+(B[m   24 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/16                                                                                                                    (B[m[39;49m[K
+(B[m   25 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/17                                                                                                                    (B[m[39;49m[K
+(B[m   26 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/18                                                                                                                    (B[m[39;49m[K
+(B[m   27 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/19                                                                                                                    (B[m[39;49m[K
+(B[m   28 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/20                                                                                                                    (B[m[39;49m[K
+(B[m   29 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/21                                                                                                                    (B[m[39;49m[K
+(B[m   30 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/22                                                                                                                    (B[m[39;49m[K
+(B[m   31 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/23                                                                                                                    (B[m[39;49m[K
+(B[m   32 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/24                                                                                                                    (B[m[39;49m[K
+(B[m   33 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/25                                                                                                                    (B[m[39;49m[K
+(B[m   34 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/26                                                                                                                    (B[m[39;49m[K
+(B[m   35 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/27                                                                                                                    (B[m[39;49m[K
+(B[m   36 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/28                                                                                                                    (B[m[39;49m[K
+(B[m   37 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/29                                                                                                                    (B[m[39;49m[K
+(B[m   38 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/30                                                                                                                    (B[m[39;49m[K
+(B[m   39 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/31                                                                                                                    (B[m[39;49m[K
+(B[m   40 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/32                                                                                                                    (B[m[39;49m[K
+(B[m   41 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/33                                                                                                                    (B[m[39;49m[K
+(B[m   42 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/34                                                                                                                    (B[m[39;49m[K
+(B[m   43 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/35                                                                                                                    (B[m[39;49m[K
+(B[m   44 root      20   0       0      0      0 S  0.0  0.0   0:00.00 rcuos/36                                                                                                                    (B[m[39;49m[K[?1l>[52;1H
+[?12l[?25h[K->c@ubuntu:~/rshell$ #^ i broke otu wit      ut with C^
+->c@ubuntu:~/rshell$ #it    TOP   top probably manually overrides C^ signal in its own process though. 
+->c@ubuntu:~/rshell$ #using the cp.c   we built earlier in the class where we know the C^ signal isnt overridden
+->c@ubuntu:~/rshell$ #we can test if rshell is handi ling this or not                    handin  ling
+->c@ubuntu:~/rshell$ c  p  bin/rs  cpp  /usr/share/c dict/american-english testcpyyy -b
+fstream: 0
+/usr/share/dict/american-english
+^C->c@ubuntu:~/rshell$ #the bencham  mark was broke before                               ls
+a.out  bin  LICENSE  Makefile  piping.cpp  README.md  src  temp  test.cpp  testcpyyy  tests
+->c@ubuntu:~/rshell$ #the benchmark was broken leaving         before all 3 t versions of the cp implementation could complete, the file still remea  ains undeleted                       testcpyyy remains undeleted                                      
+->c@ubuntu:~/rshell$ #the file testcpyyy remains because cp couldn't clean   eanup the bnechm                              the benchmark couldn't e clean     finish its cleanup
+->c@ubuntu:~/rshell$ ##cd
+->c@ubuntu:~/rshell$ cd    #a chani ging resolutions as normal works
+->c@ubuntu:~/rshell$ cd /home
+->c@ubuntu:/home$ cd ./c
+->c@ubuntu:~$ #the shell can interpret home/USERNAME and convert it to ~
+->c@ubuntu:~$ #not  e that it can't do it the other way around, I cannot do 'cd ~' a   /asdf'
+->c@ubuntu:~$ #this isn't a unix    shell requirement though, just a bash convenience
+->c@ubuntu:~$ #
+->c@ubuntu:~$ #I can also give an empty argument to cd and b                                           give an empty argument to cd and be brought to the ho      HOME though
+->c@ubuntu:~$ cd rshell
+->c@ubuntu:~/rshell$ cd
+->c@ubuntu:~$ #according to man path_resolt ution this is an old UNXI  IX standard for path resolution so I decided to e implement it
+->c@ubuntu:~$ # cd    other things work ax   s expected
+->c@ubuntu:~$ cd .
+->c@ubuntu:~$ cd rshell
+->c@ubuntu:~/rshell$ cd .
+->c@ubuntu:~/rshell$ cd ..
+->c@ubuntu:~$ # e.g. .   .  and ..    .. work as you'd expect
+->c@ubuntu:~$ cd ./
+->c@ubuntu:~$ # ./ works fine
+->c@ubuntu:~$ cd /usr/share/dict/ /
+->c@ubuntu:/usr/share/dict$ ls
+american-english  british-english  README.select-wordlist  words  words.pre-dictionaries-common
+->c@ubuntu:/usr/share/dict$ #jumping into many                   climbing multiple directories is fine
+->c@ubuntu:/usr/share/dict$ #everythings great. ok bye
+->c@ubuntu:/usr/share/dict$ exit
+]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
+exit
+
+Script done on Fri 28 Nov 2014 09:38:56 PM PST

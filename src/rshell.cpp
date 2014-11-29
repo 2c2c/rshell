@@ -334,6 +334,17 @@ void Execute(std::list<std::string> &input) {
       exit(0);
     if (input.front() == "cd") {
       input.pop_front();
+      // cd with no input case
+      if (input.empty()) {
+        auto home = getenv("HOME");
+        if (errno != 0) {
+          perror("error in getenv");
+          exit(1);
+        }
+        chdir(home);
+        return;
+      }
+      // normal cd case
       chdir(input.front().c_str());
       if (errno != 0) {
         perror("error in chdir");
@@ -621,7 +632,7 @@ std::list<std::string> PathDirectories() {
   using namespace boost;
   string path = getenv("PATH");
   if (errno != 0) {
-    perror("Error in dup open or close. Likely a nonexisting command?");
+    perror("error in getenv");
     exit(1);
   }
 
@@ -644,10 +655,10 @@ void CustomExec(std::vector<char *> command) {
   if (found != string::npos) {
     auto f = [](int) { exit(1); };
     signal(SIGINT, f);
-      if (errno != 0) {
-        perror("signal error");
-        exit(1);
-      }
+    if (errno != 0) {
+      perror("signal error");
+      exit(1);
+    }
     execv(command[0], &command[0]);
     if (errno != 0) {
       perror("execv error");
