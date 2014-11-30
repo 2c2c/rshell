@@ -97,7 +97,6 @@ a.out  bin  LICENSE  Makefile  piping.cpp  README.md  src  temp  test.cpp  testc
 ->c@ubuntu:~$ #I can also give an empty argument to cd and b                                           give an empty argument to cd and be brought to the ho      HOME though
 ->c@ubuntu:~$ cd rshell
 ->c@ubuntu:~/rshell$ cd
-->c@ubuntu:~$ #according to man path_resolt ution this is an old UNXI  IX standard for path resolution so I decided to e implement it
 ->c@ubuntu:~$ # cd    other things work ax   s expected
 ->c@ubuntu:~$ cd .
 ->c@ubuntu:~$ cd rshell
