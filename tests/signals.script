@@ -11,6 +11,8 @@ a.out  bin  LICENSE  Makefile  piping.cpp  README.md  src  temp  test.cpp  tests
 /bin/ls
 ->c@ubuntu:~/rshell$ which which
 /usr/bin/which
+->c@ubuntu:~/rshell$ #note: rshell intentionally doesn't close if errno returns that the directory doesn't exist, doesn't have hte permissions, or is trying to access a file
+->c@ubuntu:~/rshell$ #this is so that if a PATH has improper directories it can skip over junk that doesn't work and still function normally
 ->c@ubuntu:~/rshell$ #if a   th  a / / is found within the first paramte  eter input to the shell it determines its a directory               the path isnt needed and manual directory lookup is reui                                                         
 ->c@ubuntu:~/rshell$ #directory lookup is needed rather than any use of $ PATH
 ->c@ubuntu:~/rshell$ bin/rshell
@@ -109,6 +111,9 @@ a.out  bin  LICENSE  Makefile  piping.cpp  README.md  src  temp  test.cpp  testc
 ->c@ubuntu:/usr/share/dict$ ls
 american-english  british-english  README.select-wordlist  words  words.pre-dictionaries-common
 ->c@ubuntu:/usr/share/dict$ #jumping into many                   climbing multiple directories is fine
+->c@ubuntu:/usr/share/dict$ #an error in cd doesn't close rshell, it just loops back for more input from prompt
+->c@ubuntu:/usr/share/dict$ cd asdf
+error in chdir: no such file or directory
 ->c@ubuntu:/usr/share/dict$ #everythings great. ok bye
 ->c@ubuntu:/usr/share/dict$ exit
 ]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit

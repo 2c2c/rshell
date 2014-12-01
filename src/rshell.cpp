@@ -342,13 +342,15 @@ void Execute(std::list<std::string> &input) {
           exit(1);
         }
         chdir(home);
+          if (errno != 0) {
+            perror("error in chdir");
+          }
         return;
       }
       // normal cd case
       chdir(input.front().c_str());
       if (errno != 0) {
         perror("error in chdir");
-        exit(1);
       }
       return;
     }
@@ -669,6 +671,12 @@ void CustomExec(std::vector<char *> command) {
   auto path = PathDirectories();
   for (const auto &dir : path) {
     auto dirp = opendir(dir.c_str());
+    //if no dir isnt a dir, no access, or doesnt exist skip over
+    if (errno == EACCES || errno == ENOENT || errno == ENOTDIR) {
+        errno=0;
+        continue;
+    }
+    //for any other error get out
     if (errno != 0) {
       perror("opendir error");
       exit(1);
