@@ -114,8 +114,10 @@ american-english  british-english  README.select-wordlist  words  words.pre-dict
 ->c@ubuntu:/usr/share/dict$ #an error in cd doesn't close rshell, it just loops back for more input from prompt
 ->c@ubuntu:/usr/share/dict$ cd asdf
 error in chdir: no such file or directory
-->c@ubuntu:/usr/share/dict$ #everythings great. ok bye
-->c@ubuntu:/usr/share/dict$ exit
+->c@ubuntu:/usr/share/dict$ #multiple inputs in cd results in cd just interpreting the first directory
+->c@ubuntu:/usr/share/dict$ cd .. asdfasdfasdf
+->c@ubuntu:/usr/share$ #everythings great. ok bye
+->c@ubuntu:/usr/share$ exit
 ]0;c@ubuntu: ~/rshellc@ubuntu:~/rshell$ exit
 exit
 
